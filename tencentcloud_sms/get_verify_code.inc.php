@@ -31,9 +31,16 @@ try {
     if (!$dzxSMS::isPhoneNumber($phone)) {
         $dzxSMS->jsonReturn($dzxSMS::CODE_INVALID_PHONE);
     }
-    if (empty($dzxSMS::getUidByPhone($phone)) && $type === $dzxSMS::TYPE_LOGIN) {
+    $bindUid = $dzxSMS::getUidByPhone($phone);
+    //手机号未绑定
+    if (empty($bindUid) && $type === $dzxSMS::TYPE_LOGIN) {
         $dzxSMS->jsonReturn($dzxSMS::CODE_PHONE_UNBIND);
     }
+    //手机号已被使用
+    if ($type === $dzxSMS::TYPE_BIND && !empty($bindUid) && $bindUid != $_G['uid']) {
+        $dzxSMS->jsonReturn($dzxSMS::CODE_PHONE_USED);
+    }
+
     //发送验证码
     $dzxSMS->sendVerifyCodeSMS($phone,$type,$_G['uid']);
     $dzxSMS->jsonReturn($dzxSMS::CODE_SUCCESS);

@@ -19,7 +19,7 @@ if (!defined('IN_DISCUZ') || !defined('IN_ADMINCP')) {
 }
 defined('TENCENT_DISCUZX_SMS_DIR')||define( 'TENCENT_DISCUZX_SMS_DIR', __DIR__.DIRECTORY_SEPARATOR);
 if (!is_file(TENCENT_DISCUZX_SMS_DIR.'vendor/autoload.php')) {
-    exit('缺少依赖文件，请确保安装了腾讯云sdk');
+    exit(lang('plugin/tencentcloud_sms','require_sdk'));
 }
 require_once 'vendor/autoload.php';
 use TencentDiscuzSMS\SMSActions;
@@ -30,27 +30,29 @@ try {
         global $_G;
         $phone = $dzxSMS->filterPostParam('phone');
         if (!$dzxSMS::isPhoneNumber($phone)) {
-            cpmsg('请填写正确的手机号码', '', 'error');
+            cpmsg('tencentcloud_sms:phone_error', '', 'error');
         }
         $_G['setting']['tencentcloud_sms_setting'];
         $dzxSMS->sendVerifyCodeSMS($phone,$dzxSMS::TYPE_TEST);
-        cpmsg('参数填写正确，短信发送成功！', "action=plugins&operation=config&do={$pluginid}&identifier=tencentcloud_sms&pmod=sms_send_test&subaction=send", 'succeed');
+        cpmsg('tencentcloud_sms:send_success', "action=plugins&operation=config&do={$pluginid}&identifier=tencentcloud_sms&pmod=sms_send_test&subaction=send", 'succeed');
         return;
     }
+    $lang = lang('plugin/tencentcloud_sms');
+
     $tips = '<ol>
-                <li>使用<a href="admin.php?action=plugins&operation=config&do='.$pluginid.'">设置</a>里填写的参数进行短信发送测试</li>
-                <li>发送的短信仅用于测试接口，不会记录</li>
+                <li>'.$lang['use'].'<a href='.ADMINSCRIPT.'"?action=plugins&operation=config&do='.$pluginid.'">'.$lang['setting'].'</a>'.$lang['test_send'].'</li>
+                <li>'.$lang['record'].'</li>
             </ol>';
     showtips($tips);
     showformheader("plugins&operation=config&identifier=tencentcloud_sms&pmod=sms_send_test&do={$pluginid}");
-    showtableheader('发送短信');
-    showsetting('手机号', 'phone', '', 'text', 0, 0);
-    showsubmit('sms_send_test', '发送短信');
+    showtableheader($lang['send']);
+    showsetting($lang['phone'], 'phone', '', 'text', 0, 0);
+    showsubmit('sms_send_test', $lang['send']);
     showtablefooter();
     showformfooter();
     echo '<div style="text-align: center;flex: 0 0 auto;margin-top: 3rem;">
-            <a href="https://openapp.qq.com/docs/DiscuzX/sms.html" target="_blank">文档中心</a> | <a href="https://github.com/Tencent-Cloud-Plugins/tencentcloud-wordpress-plugin-sms" target="_blank">GitHub</a> | <a
-                    href="https://support.qq.com/product/164613" target="_blank">意见反馈</a>
+            <a href="https://openapp.qq.com/docs/DiscuzX/sms.html" target="_blank">'.$lang['docs_center'].'</a> | <a href="https://github.com/Tencent-Cloud-Plugins/tencentcloud-wordpress-plugin-sms" target="_blank">GitHub</a> | <a
+                    href="https://support.qq.com/product/164613" target="_blank">'.$lang['support'].'</a>
         </div>';
 }catch (\Exception $exception) {
     cpmsg($exception->getMessage(), '', 'error');

@@ -22,7 +22,7 @@ defined('TENCENT_DISCUZX_SMS_PLUGIN_NAME')||define( 'TENCENT_DISCUZX_SMS_PLUGIN_
 defined('TENCENT_DISCUZX_USER_BIND_TABLE')||define( 'TENCENT_DISCUZX_USER_BIND_TABLE', 'tencent_discuzx_sms_user_bind');
 defined('TENCENT_DISCUZX_SMS_SENT_TABLE')||define( 'TENCENT_DISCUZX_SMS_SENT_TABLE', 'tencent_discuzx_sms_sent_records');
 if (!is_file(TENCENT_DISCUZX_SMS_DIR.'vendor/autoload.php')) {
-    exit('缺少依赖文件，请确保安装了腾讯云sdk');
+    exit(lang('plugin/tencentcloud_sms','require_sdk'));
 }
 require_once 'vendor/autoload.php';
 
@@ -46,16 +46,16 @@ class plugin_tencentcloud_sms
             return;
         }
         $_G['user_phone'] = self::$G['user_phone'] = SMSActions::getPhoneByUid(self::$G['uid']);
-        if (empty(self::$G['user_phone']) && self::$G['gp_mod'] === 'post') {
+        if (empty(self::$G['user_phone']) && $_GET['mod'] == 'post') {
             //发帖前验证是否绑定了手机号
             if (self::$pluginOptions['postNeedPhone'] === SMSOptions::POST_NEED_PHONE
-                && self::$G['gp_action'] == 'newthread') {
-                showmessage('请绑定手机号后再操作');
+                && $_GET['action'] == 'newthread') {
+                showmessage('tencentcloud_sms:need_bind_phone');
             }
             //回帖前验证是否绑定了手机号
             if (self::$pluginOptions['commentNeedPhone'] === SMSOptions::COMMENT_NEED_PHONE
-                && self::$G['gp_action'] == 'reply') {
-                showmessage('请绑定手机号后再操作');
+                && $_GET['action'] == 'reply') {
+                showmessage('tencentcloud_sms:need_bind_phone');
             }
         }
     }
@@ -78,7 +78,7 @@ class plugin_tencentcloud_sms
         if (!self::$G['uid']){
             return;
         }
-        return '<a href="home.php?ac=plugin&mod=spacecp&id=tencentcloud_sms:bind_phone"><span style="color: red">未绑定手机号</span></a>';
+        return '<a href="home.php?ac=plugin&mod=spacecp&id=tencentcloud_sms:bind_phone"><span style="color: red">'.lang('plugin/tencentcloud_sms','unbind').'</span></a>';
     }
 
 }

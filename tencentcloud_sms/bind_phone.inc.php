@@ -34,15 +34,18 @@ try {
     if ( !$dzxSMS::isPhoneNumber($phone) ) {
         $dzxSMS->jsonReturn($dzxSMS::CODE_INVALID_PHONE);
     }
-
-    //获取用户
-    $user = getuserbyuid($uid, 1);
+    $bindUid = $dzxSMS::getUidByPhone($phone);
+    //手机号已被使用
+    if ( !empty($bindUid) && $bindUid != $_G['uid']) {
+        $dzxSMS->jsonReturn($dzxSMS::CODE_PHONE_USED);
+    }
 
     $DBVerifyCode = $dzxSMS->getVerifyCodeByPhone($phone);
     //验证码比对
     if ( empty($DBVerifyCode) || $DBVerifyCode['verify_code'] !== $verifyCode) {
         $dzxSMS->jsonReturn($dzxSMS::CODE_INVALID_VERIFY_CODE);
     }
+
     //验证码状态变为已使用
     $dzxSMS->loseCodeEfficacy($DBVerifyCode['id']);
     //绑定手机号

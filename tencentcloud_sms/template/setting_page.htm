@@ -19,23 +19,23 @@
         background-color: gainsboro;
     }
 </style>
-<form action="admin.php?action=plugins&operation=config&do={$pluginid}&identifier=tencentcloud_sms&pmod=setting_page" method="post">
+<form action="{$actionUrl}" method="post">
     <table class="tb tb2">
         <tbody>
         <tr>
-            <th colspan="15" class="partition">参数设置</th>
+            <th colspan="15" class="partition">{lang tencentcloud_sms:setting}</th>
         </tr>
         <tr>
-            <td colspan="2" class="td27">自定义密钥:</td>
+            <td colspan="2" class="td27">{lang tencentcloud_sms:custom_key}</td>
         </tr>
         <tr class="noborder">
             <td class="vtop rowform">
                 <ul>
-                    <li <!--{if $customKey === 1 }-->class="checked" <!--{/if}--> ><input <!--{if $customKey === 1 }-->checked="checked" <!--{/if}--> id="custom-key" class="radio" type="radio" name="customKey" value="1"><label for="custom-key">是</label></li>
-                    <li <!--{if $customKey === 0 }-->class="checked" <!--{/if}--> ><input <!--{if $customKey === 0 }-->checked="checked" <!--{/if}--> class="radio" id="global-key" type="radio" name="customKey" value="0"><label for="global-key">否</label></li>
+                    <li <!--{if $customKey === 1 }-->class="checked" <!--{/if}--> ><input <!--{if $customKey === 1 }-->checked="checked" <!--{/if}--> id="custom-key" class="radio" type="radio" name="customKey" value="1"><label for="custom-key">{lang tencentcloud_sms:yes}</label></li>
+                    <li <!--{if $customKey === 0 }-->class="checked" <!--{/if}--> ><input <!--{if $customKey === 0 }-->checked="checked" <!--{/if}--> class="radio" id="global-key" type="radio" name="customKey" value="0"><label for="global-key">{lang tencentcloud_sms:no}</label></li>
                 </ul>
             </td>
-            <td class="vtop tips2">为该插件配置单独定义的腾讯云密钥</td>
+            <td class="vtop tips2">{lang tencentcloud_sms:custom_key_desc}</td>
         </tr>
         <tr>
             <td colspan="2" class="td27" ><label for="secret-id">SecretId:</label></td>
@@ -53,8 +53,7 @@
             <td class="vtop rowform">
                 <input name="secretKey" size="42" id="secret-key" type="text" class="text" value="{$secretKey}">
             </td>
-            <td class="vtop tips2">访问<a href="https://console.qcloud.com/cam/capi" target="_blank">密钥管理</a>获取
-                SecretId和SecretKey或通过"新建密钥"创建密钥串</td>
+            <td class="vtop tips2">{lang tencentcloud_sms:visit}<a href="https://console.qcloud.com/cam/capi" target="_blank">{lang tencentcloud_sms:secret_manage}</a>{lang tencentcloud_sms:secret_key_desc}</td>
         </tr>
 
         <tr>
@@ -64,83 +63,83 @@
             <td class="vtop rowform">
                 <input name="SDKAppID" size="42" id="sdk-app-id" type="text" class="text" value="{$SDKAppID}">
             </td>
-            <td class="vtop tips2">访问<a href="https://console.cloud.tencent.com/smsv2/app-manage" target="_blank">应用列表</a>获取SDKAppID或通过"创建应用"创建SDKAppID</td>
+            <td class="vtop tips2">{lang tencentcloud_sms:visit}<a href="https://console.cloud.tencent.com/smsv2/app-manage" target="_blank">{lang tencentcloud_sms:app_manage}</a>{lang tencentcloud_sms:get_app_id}</td>
         </tr>
 
         <tr>
-            <td colspan="2" class="td27"><label for="sign">短信签名:</label></td>
+            <td colspan="2" class="td27"><label for="sign">{lang tencentcloud_sms:sign}</label></td>
         </tr>
         <tr class="noborder">
             <td class="vtop rowform">
                 <input name="sign" size="42" id="sign" type="text" class="text" value="{$sign}">
             </td>
-            <td class="vtop tips2">审核通过的短信签名，不包含【】</td>
+            <td class="vtop tips2">{lang tencentcloud_sms:sign_desc}</td>
         </tr>
 
         <tr>
-            <td colspan="2" class="td27"><label for="template-id">模板ID:</label></td>
+            <td colspan="2" class="td27"><label for="template-id">{lang tencentcloud_sms:template_id}</label></td>
         </tr>
         <tr class="noborder">
             <td class="vtop rowform">
                 <input name="templateId" size="42" id="template-id" type="text" class="text" value="{$templateId}">
             </td>
-            <td class="vtop tips2">审核通过的模板ID</td>
+            <td class="vtop tips2">{lang tencentcloud_sms:template_id_desc}</td>
         </tr>
 
         <tr>
-            <td colspan="2" class="td27"><label for="code-expired">验证码有效时间:</label></td>
+            <td colspan="2" class="td27"><label for="code-expired">{lang tencentcloud_sms:code_expire}</label></td>
         </tr>
         <tr class="noborder">
             <td class="vtop rowform">
                 <input name="codeExpired" size="42" id="code-expired" type="text" class="text" value="{$codeExpired}">
             </td>
-            <td class="vtop tips2">单位：分钟，默认5。范围【1-360】</td>
+            <td class="vtop tips2">{lang tencentcloud_sms:code_expire_desc}</td>
         </tr>
 
         <tr>
-            <td colspan="2" class="td27">模板包含过期时间:</td>
+            <td colspan="2" class="td27">{lang tencentcloud_sms:template_code_expire}</td>
         </tr>
         <tr class="noborder">
             <td class="vtop rowform">
                 <ul>
-                    <li <!--{if $hasExpireTime === 1 }-->class="checked" <!--{/if}--> ><input <!--{if $hasExpireTime === 1 }-->checked="checked" <!--{/if}--> id="has-expired-time" class="radio" type="radio" name="hasExpiredTime" value="1"><label for="has-expired-time">是</label></li>
-                    <li <!--{if $hasExpireTime === 0 }-->class="checked" <!--{/if}--> ><input <!--{if $hasExpireTime === 0 }-->checked="checked" <!--{/if}--> class="radio" id="has-not-expired-time" type="radio" name="hasExpiredTime" value="0"><label for="has-not-expired-time">否</label></li>
+                    <li <!--{if $hasExpireTime === 1 }-->class="checked" <!--{/if}--> ><input <!--{if $hasExpireTime === 1 }-->checked="checked" <!--{/if}--> id="has-expired-time" class="radio" type="radio" name="hasExpiredTime" value="1"><label for="has-expired-time">{lang tencentcloud_sms:yes}</label></li>
+                    <li <!--{if $hasExpireTime === 0 }-->class="checked" <!--{/if}--> ><input <!--{if $hasExpireTime === 0 }-->checked="checked" <!--{/if}--> class="radio" id="has-not-expired-time" type="radio" name="hasExpiredTime" value="0"><label for="has-not-expired-time">{lang tencentcloud_sms:no}</label></li>
                 </ul>
             </td>
-            <td class="vtop tips2">请与模板中参数个数保持一致，否则将导致短信发送失败</td>
+            <td class="vtop tips2">{lang tencentcloud_sms:template_code_expire_desc}</td>
         </tr>
 
         <tr>
-            <td colspan="2" class="td27">发帖需要绑定手机号:</td>
+            <td colspan="2" class="td27">{lang tencentcloud_sms:post_need_phone}</td>
         </tr>
         <tr class="noborder">
             <td class="vtop rowform">
                 <ul>
-                    <li <!--{if $postNeedPhone === 1 }-->class="checked" <!--{/if}--> ><input <!--{if $postNeedPhone === 1 }-->checked="checked" <!--{/if}--> id="post-need-phone" class="radio" type="radio" name="postNeedPhone" value="1"><label for="post-need-phone">是</label></li>
-                    <li <!--{if $postNeedPhone === 0 }-->class="checked" <!--{/if}--> ><input <!--{if $postNeedPhone === 0 }-->checked="checked" <!--{/if}--> class="radio" id="post-not-need-phone" type="radio" name="postNeedPhone" value="0"><label for="post-not-need-phone">否</label></li>
+                    <li <!--{if $postNeedPhone === 1 }-->class="checked" <!--{/if}--> ><input <!--{if $postNeedPhone === 1 }-->checked="checked" <!--{/if}--> id="post-need-phone" class="radio" type="radio" name="postNeedPhone" value="1"><label for="post-need-phone">{lang tencentcloud_sms:yes}</label></li>
+                    <li <!--{if $postNeedPhone === 0 }-->class="checked" <!--{/if}--> ><input <!--{if $postNeedPhone === 0 }-->checked="checked" <!--{/if}--> class="radio" id="post-not-need-phone" type="radio" name="postNeedPhone" value="0"><label for="post-not-need-phone">{lang tencentcloud_sms:no}</label></li>
                 </ul>
             </td>
-            <td class="vtop tips2">未绑定手机号的账号是否可以发帖</td>
+            <td class="vtop tips2">{lang tencentcloud_sms:post_need_phone_desc}</td>
         </tr>
 
         <tr>
-            <td colspan="2" class="td27">回帖需要绑定手机号:</td>
+            <td colspan="2" class="td27">{lang tencentcloud_sms:reply_need_phone}</td>
         </tr>
         <tr class="noborder">
             <td class="vtop rowform">
                 <ul>
-                    <li <!--{if $commentNeedPhone === 1 }-->class="checked" <!--{/if}--> ><input <!--{if $commentNeedPhone === 1 }-->checked="checked" <!--{/if}--> id="reply-need-phone" class="radio" type="radio" name="replyNeedPhone" value="1"><label for="reply-need-phone">是</label></li>
-                    <li <!--{if $commentNeedPhone === 0 }-->class="checked" <!--{/if}--> ><input <!--{if $commentNeedPhone === 0 }-->checked="checked" <!--{/if}--> class="radio" id="reply-not-need-phone" type="radio" name="replyNeedPhone" value="0"><label for="reply-not-need-phone">否</label></li>
+                    <li <!--{if $commentNeedPhone === 1 }-->class="checked" <!--{/if}--> ><input <!--{if $commentNeedPhone === 1 }-->checked="checked" <!--{/if}--> id="reply-need-phone" class="radio" type="radio" name="replyNeedPhone" value="1"><label for="reply-need-phone">{lang tencentcloud_sms:yes}</label></li>
+                    <li <!--{if $commentNeedPhone === 0 }-->class="checked" <!--{/if}--> ><input <!--{if $commentNeedPhone === 0 }-->checked="checked" <!--{/if}--> class="radio" id="reply-not-need-phone" type="radio" name="replyNeedPhone" value="0"><label for="reply-not-need-phone">{lang tencentcloud_sms:no}</label></li>
                 </ul>
             </td>
-            <td class="vtop tips2">未绑定手机号的账号是否可以回帖</td>
+            <td class="vtop tips2">{lang tencentcloud_sms:reply_need_phone_desc}</td>
 
         </tr>
 
         <tr>
             <td colspan="15">
                 <div class="fixsel">
-                    <input type="submit" class="btn"  id="txc-submit-btn" value="保存" />
+                    <input type="submit" class="btn"  id="txc-submit-btn" value="{lang tencentcloud_sms:save}" />
                 </div>
             </td>
         </tr>
@@ -148,8 +147,8 @@
     </table>
 </form>
 <div style="text-align: center;flex: 0 0 auto;margin-top: 3rem;">
-    <a href="https://openapp.qq.com/docs/DiscuzX/sms.html" target="_blank">文档中心</a> | <a href="https://github.com/Tencent-Cloud-Plugins/tencentcloud-discuzx-plugin-sms" target="_blank">GitHub</a> | <a
-        href="https://support.qq.com/product/164613" target="_blank">意见反馈</a>
+    <a href="https://openapp.qq.com/docs/DiscuzX/sms.html" target="_blank">{lang tencentcloud_sms:docs_center}</a> | <a href="https://github.com/Tencent-Cloud-Plugins/tencentcloud-discuzx-plugin-sms" target="_blank">GitHub</a> | <a
+        href="https://support.qq.com/product/164613" target="_blank">{lang tencentcloud_sms:support}</a>
 </div>
 <script src="source/plugin/tencentcloud_sms/js/jquery.min.js"></script>
 <script type="text/javascript">

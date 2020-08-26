@@ -39,6 +39,7 @@ try {
         $SDKAppID = $options->getSDKAppID();
         $templateId = $options->getTemplateID();
         $hasExpireTime = $options->getHasExpiredTime();
+        $actionUrl = ADMINSCRIPT.'?action=plugins&operation=config&do='.$pluginid.'&identifier=tencentcloud_sms&pmod=setting_page';
         include template('tencentcloud_sms:setting_page');
         exit;
     }

@@ -20,7 +20,7 @@ if (!defined('IN_DISCUZ') || !defined('IN_ADMINCP')) {
 defined('TENCENT_DISCUZX_SMS_DIR')||define( 'TENCENT_DISCUZX_SMS_DIR', __DIR__.DIRECTORY_SEPARATOR);
 defined('TENCENT_DISCUZX_SMS_SENT_TABLE')||define( 'TENCENT_DISCUZX_SMS_SENT_TABLE', 'tencent_discuzx_sms_sent_records');
 if (!is_file(TENCENT_DISCUZX_SMS_DIR.'vendor/autoload.php')) {
-    exit('缺少依赖文件，请确保安装了腾讯云sdk');
+    exit(lang('plugin/tencentcloud_sms','require_sdk'));
 }
 require_once 'vendor/autoload.php';
 use TencentDiscuzSMS\SMSActions;
@@ -43,13 +43,9 @@ try {
     if (!in_array($pageSize,$pageSizeValues)) {
         $page = $pageSizeValues[0];
     }
+    $lang = lang('plugin/tencentcloud_sms');
     //类型数组
-    $typeMaps = array(
-        0=>'全部',
-        $dzxSMS::TYPE_LOGIN=>'登录',
-        $dzxSMS::TYPE_BIND=>'绑定',
-        $dzxSMS::TYPE_RESET_PWD=>'重置密码',
-    );
+    $typeMaps = $lang['type_maps'];
     if (!in_array($type,array_keys($typeMaps))) {
         $type = 0;
     }
@@ -75,13 +71,13 @@ try {
         $typeOptions .= "<option value='{$key}' {$selected} >$value</option>";
     }
     showformheader($commonUrl);
-    showtableheader('验证码短信发送记录');
+    showtableheader($lang['send_record']);
     $html = <<<HTML
-<td>开始日期：<input value="$dateStart" name="dateStart" onclick="showcalendar(event, this)"></td>
-<td>截止日期：<input value="$dateEnd" name="dateEnd" onclick="showcalendar(event, this)"></td>
-<td>类型：<select name="type">$typeOptions</select></td>
-<td>每页大小：<select name="pageSize">$pageSizeOptions</select></td>
-<td>手机号：<input size="22" name="phone" value="$phone" ><button style="margin-left: 1rem;" class="btn">搜索</button></td>
+<td>{$lang['start_date']}：<input value="$dateStart" name="dateStart" onclick="showcalendar(event, this)"></td>
+<td>{$lang['end_date']}：<input value="$dateEnd" name="dateEnd" onclick="showcalendar(event, this)"></td>
+<td>{$lang['type']}：<select name="type">$typeOptions</select></td>
+<td>{$lang['page_size']}：<select name="pageSize">$pageSizeOptions</select></td>
+<td>{$lang['phone']}：<input size="22" name="phone" value="$phone" ><button style="margin-left: 1rem;" class="btn">{$lang['search']}</button></td>
 HTML;
     echo $html;
     showtablefooter();
@@ -100,7 +96,7 @@ HTML;
     }
 
     showtableheader();
-    showsubtitle(array( 'ID', '手机号', '验证码', '验证码用途', '验证码状态', '发送时间'));
+    showsubtitle($lang['table_head']);
 
     $sql = "SELECT COUNT(*) FROM %t WHERE {$where}";
     $count = DB::result_first($sql,$params);
@@ -109,11 +105,11 @@ HTML;
     $records = DB::fetch_all($sql,$params);
     foreach ($records as $record) {
         if ($record['status'] === '0') {
-            $status = '有效';
+            $status = $lang['valid'];
         } elseif($record['status'] === '1') {
-            $status = '无效';
+            $status = $lang['invalid'];
         } else {
-            $status = '已使用';
+            $status = $lang['used'];
         }
         showtablerow('', array(), array(
             $record['id'],
@@ -124,7 +120,7 @@ HTML;
             $record['send_date']
         ));
     }
-    $queryString = "admin.php?action={$commonUrl}";
+    $queryString = ADMINSCRIPT."?action={$commonUrl}";
     $pagination = multi($count, $pageSize, $page, $queryString, 99999);
     echo '<tr>
             <td colspan="6">
@@ -134,10 +130,10 @@ HTML;
         <script src="static/js/calendar.js" type="text/javascript"></script>';
     showtablefooter();
     echo '<div style="text-align: center;flex: 0 0 auto;margin-top: 3rem;">
-            <a href="https://openapp.qq.com/docs/DiscuzX/sms.html" target="_blank">文档中心</a> | 
+            <a href="https://openapp.qq.com/docs/DiscuzX/sms.html" target="_blank">'.$lang['docs_center'].'</a> | 
             <a href="https://github.com/Tencent-Cloud-Plugins/tencentcloud-wordpress-plugin-sms" 
             target="_blank">GitHub</a> | 
-            <a href="https://support.qq.com/product/164613" target="_blank">意见反馈</a>
+            <a href="https://support.qq.com/product/164613" target="_blank">'.$lang['support'].'</a>
         </div>';
 }catch (\Exception $exception) {
     cpmsg($exception->getMessage(), '', 'error');

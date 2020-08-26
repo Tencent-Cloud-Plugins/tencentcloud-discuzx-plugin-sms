@@ -34,28 +34,7 @@ class SMSActions
     const CODE_PHONE_UNBIND = 10004;
     const CODE_TWO_PWD_UNEQUAL = 10005;
     const CODE_NEW_PWD_TOO_SHORT = 10006;
-    const ERROR_MSG = array(
-        self::CODE_SUCCESS =>'操作成功',
-        self::CODE_EXCEPTION =>'系统繁忙，请稍后再试',
-        self::CODE_INVALID_PHONE =>'手机号不正确',
-        self::CODE_INVALID_VERIFY_CODE =>'验证码不正确',
-        self::CODE_NEED_LOGIN =>'请先登录后再操作',
-        self::CODE_PHONE_UNBIND =>'该手机号未绑定任何用户',
-        self::CODE_TWO_PWD_UNEQUAL =>'两次输入的密码不相等',
-        self::CODE_NEW_PWD_TOO_SHORT =>'密码长的不符合标准',
-        'FailedOperation.TemplateIncorrectOrUnapproved' => '该模版ID未审批或请求的参数个数与该模版ID不匹配',
-        'InvalidParameterValue.IncorrectPhoneNumber' => '手机号格式错误',
-        'AuthFailure.SecretIdNotFound' => '请检查Secret Id是否填写正确，注意前后不得有空格。',
-        'AuthFailure.SignatureFailure' => '请检查Secret Key是否填写正确，注意前后不得有空格。',
-        'AuthFailure.SignatureExpire' => '签名过期。本地时间和腾讯云服务器时间相差不得超过五分钟，请检查本地时间是否和北京标准时间同步',
-        'UnauthorizedOperation.SmsSdkAppidVerifyFail' => '请检查SDK APP ID是否填写正确。',
-        'FailedOperation.SignatureIncorrectOrUnapproved' => '签名填写错误或者签名未审批。',
-        'FailedOperation.InsufficientBalanceInSmsPackage' => '套餐包余量不足，请购买套餐包。',
-        'FailedOperation.PhoneNumberInBlacklist' => '手机号在黑名单库中，通常是用户退订或者命中运营商黑名单导致的。',
-        'FailedOperation.PhoneNumberOnBlacklist' => '手机号在黑名单库中，通常是用户退订或者命中运营商黑名单导致的。',
-        'LimitExceeded.PhoneNumberOneHourLimit' => '单个手机号1小时内下发短信条数超过设定的上限，可自行到腾讯云控制台调整短信频率限制策略。',
-        'LimitExceeded.PhoneNumberThirtySecondLimit' => '单个手机号30秒内下发短信条数超过设定的上限，可自行到腾讯云控制台调整短信频率限制策略。',
-    );
+    const CODE_PHONE_USED = 10007;
 
     //短信验证码发送成功
     const VERIFY_CODE_SUCCESS = 0;
@@ -86,8 +65,9 @@ class SMSActions
      */
     public function jsonReturn($code = self::CODE_SUCCESS,$data = array(),$msg = '')
     {
-        if (empty($msg) && isset(self::ERROR_MSG[$code])) {
-            $msg = self::ERROR_MSG[$code];
+        $lang = lang('plugin/tencentcloud_sms','error_msg');
+        if (empty($msg) && isset($lang[$code])) {
+            $msg = $lang[$code];
         }
         echo json_encode(array(
             'code'=>$code,
@@ -156,7 +136,7 @@ class SMSActions
     {
         $id = DB::insert(TENCENT_DISCUZX_USER_BIND_TABLE,array('uid'=>$uid,'phone'=>$phone,'valid'=>self::BIND_VALID,'bind_date'=>date('Y-m-d H:i:s')),true);
         if (!is_numeric($id)) {
-            throw new \Exception('绑定失败。');
+            throw new \Exception('bind fail');
         }
         return $id;
     }
@@ -182,20 +162,23 @@ class SMSActions
         global $_G;
         $SMSOptions = new SMSOptions();
         $options = $_G['setting'][TENCENT_DISCUZX_SMS_PLUGIN_NAME];
-        if (!empty($options)) {
-            C::t('common_pluginvar')->delete_by_pluginid($GLOBALS['pluginid']);
-            $options = unserialize($options);
-            $SMSOptions->setCustomKey($options['customKey']);
-            $SMSOptions->setSecretID($options['secretId']);
-            $SMSOptions->setSecretKey($options['secretKey']);
-            $SMSOptions->setSDKAppID($options['SDKAppID']);
-            $SMSOptions->setSign($options['sign']);
-            $SMSOptions->setTemplateID($options['templateId']);
-            $SMSOptions->setPostNeedPhone($options['postNeedPhone']);
-            $SMSOptions->setCommentNeedPhone($options['commentNeedPhone']);
-            $SMSOptions->setCodeExpired($options['codeExpired']);
-            $SMSOptions->setHasExpiredTime($options['hasExpireTime']);
+        if ( empty($options) ) {
+            $options = C::t('common_setting')->fetch(TENCENT_DISCUZX_SMS_PLUGIN_NAME);
         }
+        if ( empty($options) ) {
+            return $SMSOptions;
+        }
+        $options = unserialize($options);
+        $SMSOptions->setCustomKey($options['customKey']);
+        $SMSOptions->setSecretID($options['secretId']);
+        $SMSOptions->setSecretKey($options['secretKey']);
+        $SMSOptions->setSDKAppID($options['SDKAppID']);
+        $SMSOptions->setSign($options['sign']);
+        $SMSOptions->setTemplateID($options['templateId']);
+        $SMSOptions->setPostNeedPhone($options['postNeedPhone']);
+        $SMSOptions->setCommentNeedPhone($options['commentNeedPhone']);
+        $SMSOptions->setCodeExpired($options['codeExpired']);
+        $SMSOptions->setHasExpiredTime($options['hasExpireTime']);
         return $SMSOptions;
     }
 
@@ -210,14 +193,14 @@ class SMSActions
     public function sendVerifyCodeSMS($phone,$type,$uid = 0)
     {
         if (!self::isPhoneNumber($phone)) {
-            throw new \Exception('手机号不正确');
+            throw new \Exception(lang('plugin/tencentcloud_sms','phone_error'));
         }
         if (!in_array($type,array(self::TYPE_LOGIN,self::TYPE_BIND,self::TYPE_RESET_PWD,self::TYPE_REGISTER,self::TYPE_TEST),true)) {
-            throw new \Exception('类型不正确');
+            throw new \Exception(lang('plugin/tencentcloud_sms','type_error'));
         }
         //绑定时uid不能为空
         if (empty($uid) && in_array($type,array(self::TYPE_BIND),true)) {
-            throw new \Exception('类型不正确');
+            throw new \Exception(lang('plugin/tencentcloud_sms','type_error'));
         }
         $SMSOptions = self::getSMSOptionsObject();
         $verifyCode = self::verifyCodeGenerator();
@@ -245,7 +228,8 @@ class SMSActions
         }
         if ($status !== self::VERIFY_CODE_SUCCESS) {
             $errorCode = $response['errorCode'] ?: $response['SendStatusSet'][0]['Code'];
-            throw new \Exception('短信发送失败：'.self::ERROR_MSG[$errorCode]);
+            $lang = lang('plugin/tencentcloud_sms','error_msg');
+            throw new \Exception('failure：'.$lang[$errorCode]);
         }
         return true;
     }

@@ -34,7 +34,7 @@
     }
 </style>
 <h3 class="flb">
-    <em>手机号重置密码</em>
+    <em>{lang tencentcloud_sms:phone_reset}</em>
     <span class="flbc" onclick="hideWindow('login', 0, 1)">X</span>
 </h3>
 <form class="cl" data-referer="{echo dreferer();}">
@@ -44,20 +44,20 @@
         <div class="rfm">
             <table>
                 <tr>
-                    <th><label for="phone">手机号:</label></th>
+                    <th><label for="phone">{lang tencentcloud_sms:phone}:</label></th>
                     <td><input type="text" name="phone" id="phone"  size="28" class="px p_fre"/></td>
-                    <td class="tipcol"><a href="member.php?mod=register">立即注册</a></td>
+                    <td class="tipcol"><a href="member.php?mod=register">{lang tencentcloud_sms:reg}</a></td>
                 </tr>
             </table>
         </div>
         <div class="rfm">
             <table>
                 <tr>
-                    <th><label for="verify-code">短信验证码:</label></th>
+                    <th><label for="verify-code">{lang tencentcloud_sms:verify_code}:</label></th>
                     <td><input type="text" id="verify-code" name="verify-code" autocomplete="off" size="15"
                                class="px p_fre" style="width:6rem;"/></td>
                     <td>
-                        <button type="button" class="verify-code-btn" id="get-verify-code">发送验证码</button>
+                        <button type="button" class="verify-code-btn" id="get-verify-code">{lang tencentcloud_sms:send_verify_code}</button>
                     </td>
                 </tr>
             </table>
@@ -65,7 +65,7 @@
         <div class="rfm">
             <table>
                 <tr>
-                    <th><label for="new-pwd">新密码:</label></th>
+                    <th><label for="new-pwd">{lang tencentcloud_sms:new_pwd}:</label></th>
                     <td><input type="password" id="new-pwd" size="28" class="px p_fre"></td>
                 </tr>
             </table>
@@ -73,7 +73,7 @@
         <div class="rfm">
             <table>
                 <tr>
-                    <th><label for="confirm-new-pwd">确认新密码:</label></th>
+                    <th><label for="confirm-new-pwd">{lang tencentcloud_sms:confirm_new_pwd}:</label></th>
                     <td><input type="password" id="confirm-new-pwd" size="28" class="px p_fre"></td>
                 </tr>
             </table>
@@ -87,7 +87,7 @@
                 <tr>
                     <th></th>
                     <td>
-                        <button type="button" id="reset-btn" class="pn pnc"><strong>提交</strong></button>
+                        <button type="button" id="reset-btn" class="pn pnc"><strong>{lang tencentcloud_sms:submit}</strong></button>
                     </td>
                 </tr>
             </table>
@@ -105,11 +105,11 @@
 
         function sendCountdown() {
             if (waitTime > 0) {
-                $('#get-verify-code').text(waitTime + '秒后重新获取验证码').attr("disabled", true);
+                $('#get-verify-code').text(waitTime + '{lang tencentcloud_sms:flush_code}').attr("disabled", true);
                 waitTime--;
                 setTimeout(sendCountdown, 1000);
             } else {
-                $('#get-verify-code').text('获取短信验证码').attr("disabled", false).fadeTo("slow", 1);
+                $('#get-verify-code').text('{lang tencentcloud_sms:get_verify_code}').attr("disabled", false).fadeTo("slow", 1);
                 waitTime = 60;
             }
         }
@@ -119,7 +119,7 @@
             var phone = $("#phone").val();
             //校验手机号
             if (phone === '' || !phone.match(/^1[3-9]\d{9}$/)) {
-                showDialog('手机号格式错误！', 'error', '警告', function () {
+                showDialog('{lang tencentcloud_sms:phone_error}', 'error', 'warning', function () {
                     $("#phone").focus();
                 });
                 return;
@@ -135,7 +135,7 @@
                 },
                 success: function (response) {
                     if (response.code !== 0) {
-                        showDialog(response.msg, 'error', '错误提示');
+                        showDialog(response.msg, 'error', 'error Tips');
                         return;
                     }
                     sendCountdown();
@@ -152,21 +152,21 @@
             var secCodeHash = $("input[name='seccodehash']").val();
             //校验手机号
             if (phone === '' || !phone.match(/^1[3-9]\d{9}$/)) {
-                showDialog('手机号格式错误！', 'error', '警告', function () {
+                showDialog('{lang tencentcloud_sms:phone_error}', 'error', 'warning', function () {
                     $("#phone").focus();
                 });
                 return;
             }
             //校验短信验证码
             if (verifyCode === '' || verifyCode.length < 4) {
-                showDialog('短信验证码填写错误！', 'error', '警告', function () {
+                showDialog('{lang tencentcloud_sms:code_error}', 'error', 'warning', function () {
                     $("#verify-code").focus();
                 });
                 return;
             }
             //校验新密码
             if (newPwd === '' || newPwd !== confirmNewPwd) {
-                showDialog('两次填写的密码不一致！', 'error', '警告', function () {
+                showDialog('{lang tencentcloud_sms:two_pwd_diff}', 'error', 'warning', function () {
                     $("#new-pwd").focus();
                 });
                 return;
@@ -185,10 +185,10 @@
                 },
                 success: function (response) {
                     if (response.code !== 0) {
-                        showDialog(response.msg, 'error', '错误提示');
+                        showDialog(response.msg, 'error', 'error');
                         return;
                     }
-                    showDialog('重置密码成功！', 'right', '重置密码成功', function () {
+                    showDialog('{lang tencentcloud_sms:reset_success}', 'right', 'success', function () {
                         window.location.href = response.data.location;
                     });
                 }

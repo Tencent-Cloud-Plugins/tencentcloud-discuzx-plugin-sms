@@ -19,58 +19,58 @@ if (!defined('IN_DISCUZ') || !defined('IN_ADMINCP')){
 }
 defined('TENCENT_DISCUZX_SMS_DIR')||define( 'TENCENT_DISCUZX_SMS_DIR', __DIR__.DIRECTORY_SEPARATOR);
 if (!is_file(TENCENT_DISCUZX_SMS_DIR.'vendor/autoload.php')) {
-    exit('缺少依赖文件，请确保安装了腾讯云sdk');
+    exit(lang('plugin/tencentcloud_sms','require_sdk'));
 }
 require_once 'vendor/autoload.php';
 use TencentDiscuzSMS\SMSActions;
 global $_G;
 $careatesql = "CREATE TABLE IF NOT EXISTS cdb_tencentcloud_pluginInfo (
-       `plugin_name` varchar(255) NOT NULL DEFAULT '',
+       `plugin_name` varchar(150) NOT NULL DEFAULT '',
        `version` varchar(32) NOT NULL DEFAULT '',
        `href` varchar(255) NOT NULL  DEFAULT '',
        `plugin_id` varchar(255) NOT NULL DEFAULT '',
        `activation` varchar(32) NOT NULL DEFAULT '',
        `status` varchar(32) NOT NULL DEFAULT '',
-       `install_datetime` timestamp NOT NULL DEFAULT  CURRENT_TIMESTAMP(),
+       `install_datetime` bigint NOT NULL DEFAULT 0,
        `last_modify_datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP(),
        PRIMARY KEY (`plugin_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 ";
 runquery($careatesql);
-$pluginId = $_G['gp_pluginid'];
-$href = 'admin.php?action=plugins&operation=config&do='.$pluginId;
+$href = ADMINSCRIPT.'?action=plugins&operation=config&do=' . $pluginid;
+$time = time();
 $inserSQL=<<<EOF
-REPLACE INTO pre_tencentcloud_pluginInfo (`plugin_name`, `version`, `href`, `plugin_id`, `activation`,`status`)
- VALUES ( 'tencentcloud_sms', '1.0.0', '$href',  '$pluginId', 'true','false');
+REPLACE INTO pre_tencentcloud_pluginInfo (`plugin_name`, `version`, `href`, `plugin_id`, `activation`, `status`, `install_datetime`)
+ VALUES ( 'tencentcloud_sms', '1.0.0', '$href', '$pluginid', 'true', 'false', '$time');
 EOF;
 runquery($inserSQL);
 
 $sql = <<<SQL
 CREATE TABLE IF NOT EXISTS `cdb_tencent_discuzx_sms_sent_records` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `uid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '用户uid',
-  `verify_code` varchar(16) NOT NULL DEFAULT '' COMMENT '验证码',
-  `phone` varchar(32) NOT NULL DEFAULT '' COMMENT '手机号',
-  `type` int(10) unsigned NOT NULL  DEFAULT 1 COMMENT '发送类型 1：登录，2：绑定，3：找回密码，4：注册',
-  `template_id` varchar(32) NOT NULL DEFAULT '' COMMENT '模板id',
-  `template_params` text NOT NULL COMMENT '模板参数',
-  `response` text NOT NULL COMMENT '接口返回',
-  `status` int(10) unsigned  NOT NULL DEFAULT 0 COMMENT '状态 0：正常  1：验证码发送失败 2：验证码已失效',
-  `send_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发送时间',
+  `uid` int(10) unsigned NOT NULL DEFAULT 0,
+  `verify_code` varchar(16) NOT NULL DEFAULT '' ,
+  `phone` varchar(32) NOT NULL DEFAULT '' ,
+  `type` int(10) unsigned NOT NULL  DEFAULT 1 ,
+  `template_id` varchar(32) NOT NULL DEFAULT '',
+  `template_params` text NOT NULL ,
+  `response` text NOT NULL ,
+  `status` int(10) unsigned  NOT NULL DEFAULT 0 ,
+  `send_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='短信发送记录表';
+) ENGINE=InnoDB;
 SQL;
 runquery($sql);
 
 $sql = <<<SQL
 CREATE TABLE IF NOT EXISTS `cdb_tencent_discuzx_sms_user_bind` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `uid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '用户uid',
-  `phone` varchar(32) NOT NULL DEFAULT '' COMMENT '手机号',
-  `valid` int(10) unsigned NOT NULL  DEFAULT 1 COMMENT '是否有效 0：失效，1：有效',
-  `bind_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '绑定时间',
+  `uid` int(10) unsigned NOT NULL DEFAULT 0 ,
+  `phone` varchar(32) NOT NULL DEFAULT '' ,
+  `valid` int(10) unsigned NOT NULL  DEFAULT 1 ,
+  `bind_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户手机号绑定表';
+) ENGINE=InnoDB;
 SQL;
 runquery($sql);
 SMSActions::uploadDzxStatisticsData('activate');

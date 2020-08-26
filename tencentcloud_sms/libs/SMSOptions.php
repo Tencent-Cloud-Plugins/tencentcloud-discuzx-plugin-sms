@@ -75,7 +75,7 @@ class SMSOptions
     public function setSecretID($secretID)
     {
         if ( empty($secretID) && $this->customKey !== self::GLOBAL_KEY) {
-            throw new \Exception('secretID不能为空');
+            throw new \Exception('secretID'.lang('plugin/tencentcloud_sms','param_empty'));
         }
         $this->secretID = $secretID;
     }
@@ -83,7 +83,7 @@ class SMSOptions
     public function setCustomKey($customKey)
     {
         if ( !in_array($customKey, array(self::GLOBAL_KEY, self::CUSTOM_KEY)) ) {
-            throw new \Exception('自定义密钥传参错误');
+            throw new \Exception(lang('plugin/tencentcloud_sms','custom_error'));
         }
         $this->customKey = intval($customKey);
     }
@@ -91,7 +91,7 @@ class SMSOptions
     public function setSecretKey($secretKey)
     {
         if ( empty($secretKey) && $this->customKey !== self::GLOBAL_KEY ) {
-            throw new \Exception('secretKey不能为空');
+            throw new \Exception('secretKey'.lang('plugin/tencentcloud_sms','param_empty'));
         }
         $this->secretKey = $secretKey;
     }
@@ -99,7 +99,7 @@ class SMSOptions
     public function setSDKAppID($SDKAppID)
     {
         if ( empty($SDKAppID) ) {
-            throw new \Exception('SDKAppID不能为空');
+            throw new \Exception('SDKAppID'.lang('plugin/tencentcloud_sms','param_empty'));
         }
         $this->SDKAppID = $SDKAppID;
     }
@@ -107,7 +107,7 @@ class SMSOptions
     public function setSign($sign)
     {
         if ( empty($sign) ) {
-            throw new \Exception('短信签名不能为空');
+            throw new \Exception(lang('plugin/tencentcloud_sms','sign_empty'));
         }
         $this->sign = $sign;
     }
@@ -115,7 +115,7 @@ class SMSOptions
     public function setTemplateID($templateID)
     {
         if ( empty($templateID) ) {
-            throw new \Exception('模板ID不能为空');
+            throw new \Exception(lang('plugin/tencentcloud_sms','template_id_empty'));
         }
         $this->templateID = $templateID;
     }
@@ -128,7 +128,7 @@ class SMSOptions
     public function setCodeExpired($codeExpired)
     {
         if ( empty($codeExpired) ) {
-            throw new \Exception('验证码有效时间不能为空');
+            throw new \Exception(lang('plugin/tencentcloud_sms','code_expired_empty'));
         }
         if ( $codeExpired > 360 ) {
             $codeExpired = 360;
