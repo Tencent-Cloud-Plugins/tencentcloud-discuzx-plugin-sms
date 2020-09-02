@@ -119,10 +119,10 @@ class SMSActions
     {
         $SMSOptions = self::getSMSOptionsObject();
         $expired = $SMSOptions->getCodeExpired();
-        $dateStart = date('Y-m-d H:i:s', TIMESTAMP - $expired*60);
-        $dateEnd = date('Y-m-d H:i:s');
-        $sql = "SELECT `id`,`verify_code` FROM %t WHERE `status`=%d AND `phone`= %s AND `send_date` BETWEEN %s AND %s ORDER BY `id` DESC";
-        return  DB::fetch_first($sql,array(TENCENT_DISCUZX_SMS_SENT_TABLE,self::VERIFY_CODE_SUCCESS,$phone,$dateStart,$dateEnd));
+        $dateEnd = time();
+        $dateStart = $dateEnd - $expired*60;
+        $sql = "SELECT `id`,`verify_code` FROM %t WHERE `status`=%d AND `phone`= %s AND `send_date` BETWEEN %d AND %d ORDER BY `id` DESC";
+        return DB::fetch_first($sql,array(TENCENT_DISCUZX_SMS_SENT_TABLE,self::VERIFY_CODE_SUCCESS,$phone,$dateStart,$dateEnd));
     }
 
     /**
@@ -134,7 +134,7 @@ class SMSActions
      */
     public function userBindPhone($phone, $uid)
     {
-        $id = DB::insert(TENCENT_DISCUZX_USER_BIND_TABLE,array('uid'=>$uid,'phone'=>$phone,'valid'=>self::BIND_VALID,'bind_date'=>date('Y-m-d H:i:s')),true);
+        $id = DB::insert(TENCENT_DISCUZX_USER_BIND_TABLE,array('uid'=>$uid,'phone'=>$phone,'valid'=>self::BIND_VALID,'bind_date'=>time()),true);
         if (!is_numeric($id)) {
             throw new \Exception('bind fail');
         }
@@ -179,6 +179,7 @@ class SMSActions
         $SMSOptions->setCommentNeedPhone($options['commentNeedPhone']);
         $SMSOptions->setCodeExpired($options['codeExpired']);
         $SMSOptions->setHasExpiredTime($options['hasExpireTime']);
+        $SMSOptions->setBindPhoneTips($options['bindPhoneTips']);
         return $SMSOptions;
     }
 
@@ -224,6 +225,7 @@ class SMSActions
             $saveData['template_params'] = json_encode($templateParams,JSON_UNESCAPED_UNICODE);
             $saveData['template_id'] = $SMSOptions->getTemplateID();
             $saveData['status'] = $status;
+            $saveData['send_date'] = time();
             $this->saveSMSSentRecord($saveData);
         }
         if ($status !== self::VERIFY_CODE_SUCCESS) {
@@ -294,9 +296,14 @@ class SMSActions
         if (empty($uid) || !is_numeric($uid)) {
             return '';
         }
+        $uid = intval($uid);
         $sql = "SELECT `phone` FROM %t WHERE `valid`=%d AND `uid`= %d ORDER BY `id` DESC";
         $result = DB::fetch_first($sql,array(TENCENT_DISCUZX_USER_BIND_TABLE,self::BIND_VALID,$uid));
-        return isset($result['phone'])?$result['phone']:'';
+        $phone = '';
+        if (isset($result['phone']) && !empty($result['phone'])) {
+            $phone = $result['phone'];
+        }
+        return $phone;
     }
     /**
      * 通过手机号获取uid

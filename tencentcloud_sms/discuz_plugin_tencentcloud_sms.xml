@@ -18,7 +18,7 @@
 			<item id="datatables"><![CDATA[]]></item>
 			<item id="directory"><![CDATA[tencentcloud_sms/]]></item>
 			<item id="copyright"><![CDATA[腾讯云]]></item>
-			<item id="version"><![CDATA[1.0.0]]></item>
+			<item id="version"><![CDATA[1.0.1]]></item>
 			<item id="__modules">
 				<item id="0">
 					<item id="name"><![CDATA[tencentcloud_sms]]></item>
@@ -144,6 +144,7 @@
 					<item id="10007"><![CDATA[该手机号已绑定其他用户]]></item>
 					<item id="FailedOperation.TemplateIncorrectOrUnapproved"><![CDATA[该模版ID未审批或请求的参数个数与该模版ID不匹配]]></item>
 					<item id="InvalidParameterValue.IncorrectPhoneNumber"><![CDATA[手机号格式错误]]></item>
+					<item id="InvalidParameter"><![CDATA[模板ID与模板参数个数不匹配]]></item>
 					<item id="AuthFailure.SecretIdNotFound"><![CDATA[请检查Secret Id是否填写正确，注意前后不得有空格。]]></item>
 					<item id="AuthFailure.SignatureFailure"><![CDATA[请检查Secret Key是否填写正确，注意前后不得有空格。]]></item>
 					<item id="AuthFailure.SignatureExpire"><![CDATA[签名过期。本地时间和腾讯云服务器时间相差不得超过五分钟，请检查本地时间是否和北京标准时间同步]]></item>
@@ -178,6 +179,8 @@
 				<item id="post_need_phone"><![CDATA[发帖需要绑定手机号:]]></item>
 				<item id="post_need_phone_desc"><![CDATA[未绑定手机号的账号是否可以发帖]]></item>
 				<item id="reply_need_phone"><![CDATA[回帖需要绑定手机号:]]></item>
+				<item id="bind_phone_tips"><![CDATA[展示绑定手机号提示:]]></item>
+				<item id="bind_phone_tips_desc"><![CDATA[是否展示绑定手机号提示，开启会对性能有一些影响]]></item>
 				<item id="save"><![CDATA[保存]]></item>
 				<item id="reply_need_phone_desc"><![CDATA[未绑定手机号的账号是否可以回帖]]></item>
 				<item id="bind_phone"><![CDATA[绑定手机号]]></item>

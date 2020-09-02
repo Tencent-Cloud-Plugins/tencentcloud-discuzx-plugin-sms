@@ -41,7 +41,8 @@
 </style>
 <div class="txc-container">
     <form>
-        <div id="bind-block" {if !empty($_G['user_phone']) } style="display: none;" {/if} >
+        <!--{eval $userPhone = \TencentDiscuzSMS\SMSActions::getPhoneByUid($_G['uid']);}-->
+        <div id="bind-block" {if !empty($userPhone) } style="display: none;" {/if} >
             <p class="txc-p">
             <label for="phone">{lang tencentcloud_sms:bind_phone}：<span class="rq">*</span></label>
             <input type="text" id="phone" size="28" class="px" autocomplete="off">
@@ -55,8 +56,8 @@
                 <button type="button" id="txc-submit-btn" class="pn pnc"><strong>{lang tencentcloud_sms:bind}</strong></button>
             </p>
         </div>
-<div id="rebind-block" {if empty($_G['user_phone']) } style="display: none;" {/if}>
-    <span>{lang tencentcloud_sms:has_bind}：</span><!--{eval echo substr_replace($_G['user_phone'],"****",3,4);}-->
+<div id="rebind-block" {if empty($userPhone) } style="display: none;" {/if}>
+    <span>{lang tencentcloud_sms:has_bind}：</span><!--{eval echo substr_replace($userPhone,"****",3,4);}-->
     <button type="button" id="rebind-btn"> {lang tencentcloud_sms:rebind}</button>
 </div>
     </form>
@@ -65,6 +66,7 @@
 <script type="text/javascript">
     jQuery.noConflict();
     jQuery(function($){
+        var random = Math.random().toString(16).substr(-8);
         //倒计时
         var waitTime = 60;
         //ajax请求地址
@@ -94,9 +96,10 @@
                 });
                 return;
             }
+
             $.ajax({
                 type: "post",
-                url: ajaxUrlPrefix+'get_verify_code',
+                url: ajaxUrlPrefix+'get_verify_code&random_num='+random,
                 dataType:"json",
                 data:{
                     phone:phone,
@@ -131,7 +134,7 @@
             }
             $.ajax({
                 type: "post",
-                url: ajaxUrlPrefix + 'bind_phone',
+                url: ajaxUrlPrefix + 'bind_phone&random_num='+random,
                 dataType: "json",
                 data: {
                     phone: phone,

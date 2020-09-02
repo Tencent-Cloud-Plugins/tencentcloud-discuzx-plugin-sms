@@ -74,7 +74,13 @@
 
 ## 7.GitHub版本迭代记录
 
+### 7.2 tencentcloud-discuzx-plugin-sms v1.0.1
+- 慢查询Bug修复
+- 时区问题导致验证码查询失败Bug修复
+- 模板参数不正确报错提示Bug修复
+
 ### 7.1 tencentcloud-discuzx-plugin-sms v1.0.0
+
 - 支持在个人资料页绑定手机号
 - 通过手机号/验证码登陆站点。
 - 支持发贴/回帖前验证是否绑定了手机号码。

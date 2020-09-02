@@ -39,6 +39,7 @@ try {
         $SDKAppID = $options->getSDKAppID();
         $templateId = $options->getTemplateID();
         $hasExpireTime = $options->getHasExpiredTime();
+        $bindPhoneTips = $options->getBindPhoneTips();
         $actionUrl = ADMINSCRIPT.'?action=plugins&operation=config&do='.$pluginid.'&identifier=tencentcloud_sms&pmod=setting_page';
         include template('tencentcloud_sms:setting_page');
         exit;
@@ -55,6 +56,7 @@ try {
     $options->setCommentNeedPhone($dzxSMS->filterPostParam('replyNeedPhone',SMSOptions::COMMENT_NEED_PHONE));
     $options->setCodeExpired($dzxSMS->filterPostParam('codeExpired',SMSOptions::DEFAULT_EXPIRED));
     $options->setHasExpiredTime($dzxSMS->filterPostParam('hasExpiredTime',SMSOptions::NOT_EXPIRED_TIME));
+    $options->setBindPhoneTips($dzxSMS->filterPostParam('bindPhoneTips',SMSOptions::HIDE_BIND_PHONE_TIPS));
 
     C::t('common_setting')->update_batch(array("tencentcloud_sms" => $options->toArray()));
     updatecache('setting');

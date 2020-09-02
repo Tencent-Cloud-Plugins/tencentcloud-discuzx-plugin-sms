@@ -30,33 +30,31 @@ use TencentDiscuzSMS\SMSActions;
 use TencentDiscuzSMS\SMSOptions;
 class plugin_tencentcloud_sms
 {
-    public static $G;
-    public static $pluginOptions;
-    public function __construct()
-    {
-        global $_G;
-        self::$G = $_G;
-        self::$pluginOptions = unserialize($_G['setting'][TENCENT_DISCUZX_SMS_PLUGIN_NAME]);
-    }
-
     public function common()
     {
         global $_G;
-        if (empty(self::$G['uid'])) {
+        if (empty($_G['uid'])) {
             return;
         }
-        $_G['user_phone'] = self::$G['user_phone'] = SMSActions::getPhoneByUid(self::$G['uid']);
-        if (empty(self::$G['user_phone']) && $_GET['mod'] == 'post') {
-            //发帖前验证是否绑定了手机号
-            if (self::$pluginOptions['postNeedPhone'] === SMSOptions::POST_NEED_PHONE
-                && $_GET['action'] == 'newthread') {
-                showmessage('tencentcloud_sms:need_bind_phone');
-            }
-            //回帖前验证是否绑定了手机号
-            if (self::$pluginOptions['commentNeedPhone'] === SMSOptions::COMMENT_NEED_PHONE
-                && $_GET['action'] == 'reply') {
-                showmessage('tencentcloud_sms:need_bind_phone');
-            }
+        //非发帖回帖直接返回
+        if($_GET['mod'] !== 'post' || !in_array($_GET['action'],array('newthread','reply'))) {
+            return;
+        }
+        $userPhone = SMSActions::getPhoneByUid($_G['uid']);
+        //手机号不为空直接返回
+        if (!empty($userPhone)) {
+            return;
+        }
+        $pluginOptions = unserialize($_G['setting'][TENCENT_DISCUZX_SMS_PLUGIN_NAME]);
+        //发帖前验证是否绑定了手机号
+        if ($pluginOptions['postNeedPhone'] === SMSOptions::POST_NEED_PHONE
+            && $_GET['action'] == 'newthread') {
+            showmessage('tencentcloud_sms:need_bind_phone');
+        }
+        //回帖前验证是否绑定了手机号
+        if ($pluginOptions['commentNeedPhone'] === SMSOptions::COMMENT_NEED_PHONE
+            && $_GET['action'] == 'reply') {
+            showmessage('tencentcloud_sms:need_bind_phone');
         }
     }
 
@@ -65,17 +63,24 @@ class plugin_tencentcloud_sms
     {
         include template('tencentcloud_sms:phone_functions_btn');
         return $phone_functions_btn;
-
     }
 
-    // 已登录用户导航栏区域
+    //用户导航栏区域
     public function global_usernav_extra3()
     {
-        //用户已绑定手机号不显示
-        if (self::$G['user_phone']) {
+        global $_G;
+        $pluginOptions = unserialize($_G['setting'][TENCENT_DISCUZX_SMS_PLUGIN_NAME]);
+        //后台不开启
+        if ($pluginOptions['bindPhoneTips'] === SMSOptions::HIDE_BIND_PHONE_TIPS) {
             return;
         }
-        if (!self::$G['uid']){
+        $userPhone = SMSActions::getPhoneByUid($_G['uid']);
+        //用户已绑定手机号不显示
+        if (!empty($userPhone)) {
+            return;
+        }
+        //未登录不显示
+        if (empty($_G['uid'])){
             return;
         }
         return '<a href="home.php?ac=plugin&mod=spacecp&id=tencentcloud_sms:bind_phone"><span style="color: red">'.lang('plugin/tencentcloud_sms','unbind').'</span></a>';
@@ -87,8 +92,13 @@ class plugin_tencentcloud_sms_forum extends plugin_tencentcloud_sms
 {
     public function viewthread_fastpost_btn_extra()
     {
-        if (self::$pluginOptions['commentNeedPhone'] === SMSOptions::COMMENT_NEED_PHONE
-            && empty(self::$G['user_phone'])) {
+        global $_G;
+        $pluginOptions = unserialize($_G['setting'][TENCENT_DISCUZX_SMS_PLUGIN_NAME]);
+        if ($pluginOptions['commentNeedPhone'] !== SMSOptions::COMMENT_NEED_PHONE) {
+            return;
+        }
+        $userPhone = SMSActions::getPhoneByUid($_G['uid']);
+        if (empty($userPhone)) {
             include template('tencentcloud_sms:need_bind_phone');
             return $need_bind_phone;
         }
@@ -96,8 +106,13 @@ class plugin_tencentcloud_sms_forum extends plugin_tencentcloud_sms
 
     public function forumdisplay_postbutton_top()
     {
-        if (self::$pluginOptions['postNeedPhone'] === SMSOptions::POST_NEED_PHONE
-            && empty(self::$G['user_phone'])) {
+        global $_G;
+        $pluginOptions = unserialize($_G['setting'][TENCENT_DISCUZX_SMS_PLUGIN_NAME]);
+        if ($pluginOptions['postNeedPhone'] !== SMSOptions::POST_NEED_PHONE) {
+            return;
+        }
+        $userPhone = SMSActions::getPhoneByUid($_G['uid']);
+        if (empty($userPhone)) {
             include template('tencentcloud_sms:need_bind_phone');
             return $need_bind_phone;
         }
@@ -105,8 +120,13 @@ class plugin_tencentcloud_sms_forum extends plugin_tencentcloud_sms
 
     public function forumdisplay_postbutton_bottom()
     {
-        if (self::$pluginOptions['postNeedPhone'] === SMSOptions::POST_NEED_PHONE
-            && empty(self::$G['user_phone'])) {
+        global $_G;
+        $pluginOptions = unserialize($_G['setting'][TENCENT_DISCUZX_SMS_PLUGIN_NAME]);
+        if ($pluginOptions['postNeedPhone'] !== SMSOptions::POST_NEED_PHONE) {
+            return;
+        }
+        $userPhone = SMSActions::getPhoneByUid($_G['uid']);
+        if (empty($userPhone)) {
             include template('tencentcloud_sms:need_bind_phone');
             return $need_bind_phone;
         }
@@ -114,8 +134,13 @@ class plugin_tencentcloud_sms_forum extends plugin_tencentcloud_sms
 
     public function forumdisplay_fastpost_btn_extra()
     {
-        if (self::$pluginOptions['postNeedPhone'] === SMSOptions::POST_NEED_PHONE
-            && empty(self::$G['user_phone'])) {
+        global $_G;
+        $pluginOptions = unserialize($_G['setting'][TENCENT_DISCUZX_SMS_PLUGIN_NAME]);
+        if ($pluginOptions['postNeedPhone'] !== SMSOptions::POST_NEED_PHONE) {
+            return;
+        }
+        $userPhone = SMSActions::getPhoneByUid($_G['uid']);
+        if (empty($userPhone)) {
             include template('tencentcloud_sms:need_bind_phone');
             return $need_bind_phone;
         }

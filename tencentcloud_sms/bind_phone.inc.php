@@ -14,14 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-if (!defined('IN_DISCUZ')) {
+if ( !defined('IN_DISCUZ') ) {
     exit('Access Denied');
 }
 //不是ajax请求直接返回html页面inajax
-if( !isset($_SERVER['HTTP_X_REQUESTED_WITH']) || $_SERVER['HTTP_X_REQUESTED_WITH'] !== 'XMLHttpRequest') {
+if ( !isset($_SERVER['HTTP_X_REQUESTED_WITH']) || $_SERVER['HTTP_X_REQUESTED_WITH'] !== 'XMLHttpRequest' ) {
     return;
 }
+
 use TencentDiscuzSMS\SMSActions;
+
 try {
     $dzxSMS = new SMSActions();
     global $_G;
@@ -36,13 +38,13 @@ try {
     }
     $bindUid = $dzxSMS::getUidByPhone($phone);
     //手机号已被使用
-    if ( !empty($bindUid) && $bindUid != $_G['uid']) {
+    if ( !empty($bindUid) && $bindUid != $_G['uid'] ) {
         $dzxSMS->jsonReturn($dzxSMS::CODE_PHONE_USED);
     }
 
     $DBVerifyCode = $dzxSMS->getVerifyCodeByPhone($phone);
     //验证码比对
-    if ( empty($DBVerifyCode) || $DBVerifyCode['verify_code'] !== $verifyCode) {
+    if ( empty($DBVerifyCode) || $DBVerifyCode['verify_code'] !== $verifyCode ) {
         $dzxSMS->jsonReturn($dzxSMS::CODE_INVALID_VERIFY_CODE);
     }
 
@@ -53,6 +55,6 @@ try {
     $dzxSMS->jsonReturn($dzxSMS::CODE_SUCCESS);
 
 } catch (\Exception $exception) {
-    $dzxSMS->jsonReturn($dzxSMS::CODE_EXCEPTION,array(),$exception->getMessage());
+    $dzxSMS->jsonReturn($dzxSMS::CODE_EXCEPTION, array(), $exception->getMessage());
 }
 

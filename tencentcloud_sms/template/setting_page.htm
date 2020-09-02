@@ -137,6 +137,20 @@
         </tr>
 
         <tr>
+            <td colspan="2" class="td27">{lang tencentcloud_sms:bind_phone_tips}</td>
+        </tr>
+        <tr class="noborder">
+            <td class="vtop rowform">
+                <ul>
+                    <li <!--{if $bindPhoneTips === 1 }-->class="checked" <!--{/if}--> ><input <!--{if $bindPhoneTips === 1 }-->checked="checked" <!--{/if}--> id="show-bind-tips" class="radio" type="radio" name="bindPhoneTips" value="1"><label for="show-bind-tips">{lang tencentcloud_sms:yes}</label></li>
+                    <li <!--{if $bindPhoneTips === 0 }-->class="checked" <!--{/if}--> ><input <!--{if $bindPhoneTips === 0 }-->checked="checked" <!--{/if}--> class="radio" id="hide-bind-tips" type="radio" name="bindPhoneTips" value="0"><label for="hide-bind-tips">{lang tencentcloud_sms:no}</label></li>
+                </ul>
+            </td>
+            <td class="vtop tips2">{lang tencentcloud_sms:bind_phone_tips_desc}</td>
+
+        </tr>
+
+        <tr>
             <td colspan="15">
                 <div class="fixsel">
                     <input type="submit" class="btn"  id="txc-submit-btn" value="{lang tencentcloud_sms:save}" />

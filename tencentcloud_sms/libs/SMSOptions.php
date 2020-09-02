@@ -31,6 +31,10 @@ class SMSOptions
     const COMMENT_NEED_PHONE = 1;
     //发文章需要验证手机号
     const POST_NEED_PHONE = 1;
+    //隐藏绑定手机号提示
+    const HIDE_BIND_PHONE_TIPS = 0;
+    //展示绑定手机号提示
+    const SHOW_BIND_PHONE_TIPS = 1;
 
     private $commonOptions;
     private $secretID;
@@ -43,9 +47,16 @@ class SMSOptions
     private $codeExpired;
     private $commentNeedPhone;
     private $postNeedPhone;
+    private $bindPhoneTips;
 
 
-    public function __construct($customKey = self::GLOBAL_KEY, $secretID = '', $secretKey = '', $SDKAppID = '', $sign = '', $templateID = '', $hasExpiredTime = self::NOT_EXPIRED_TIME, $codeExpired = self::DEFAULT_EXPIRED, $commentNeedPhone = self::COMMENT_NEED_PHONE, $postNeedPhone = self::POST_NEED_PHONE)
+    public function __construct(
+        $customKey = self::GLOBAL_KEY, $secretID = '', $secretKey = '', $SDKAppID = '',
+        $sign = '', $templateID = '', $hasExpiredTime = self::NOT_EXPIRED_TIME,
+        $codeExpired = self::DEFAULT_EXPIRED,
+        $commentNeedPhone = self::COMMENT_NEED_PHONE, $postNeedPhone = self::POST_NEED_PHONE,
+    $bindPhoneTips = self::HIDE_BIND_PHONE_TIPS
+    )
     {
         $this->customKey = $customKey;
         $this->secretID = $secretID;
@@ -57,6 +68,7 @@ class SMSOptions
         $this->codeExpired = $codeExpired;
         $this->commentNeedPhone = $commentNeedPhone;
         $this->postNeedPhone = $postNeedPhone;
+        $this->bindPhoneTips = $bindPhoneTips;
         global $_G;
         if (isset($_G['setting']['tencentcloud_center'])) {
             $this->commonOptions = unserialize($_G['setting']['tencentcloud_center']);
@@ -136,7 +148,7 @@ class SMSOptions
         if ( $codeExpired < 1 ) {
             $codeExpired = 1;
         }
-        $this->codeExpired = strval(ceil($codeExpired));
+        $this->codeExpired = intval(ceil($codeExpired));
     }
 
     public function setCommentNeedPhone($commentNeedPhone)
@@ -147,6 +159,11 @@ class SMSOptions
     public function setPostNeedPhone($postNeedPhone)
     {
         $this->postNeedPhone = intval($postNeedPhone);
+    }
+
+    public function setBindPhoneTips($bindPhoneTips)
+    {
+        $this->bindPhoneTips = intval($bindPhoneTips);
     }
 
 
@@ -206,6 +223,11 @@ class SMSOptions
         return $this->customKey;
     }
 
+    public function getBindPhoneTips()
+    {
+        return $this->bindPhoneTips;
+    }
+
     public function toArray()
     {
         return array(
@@ -219,6 +241,7 @@ class SMSOptions
             'commentNeedPhone'=>$this->commentNeedPhone,
             'codeExpired'=>$this->codeExpired,
             'hasExpireTime'=>$this->hasExpireTime,
+            'bindPhoneTips'=>$this->bindPhoneTips,
         );
     }
 }

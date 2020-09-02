@@ -82,17 +82,19 @@ HTML;
     echo $html;
     showtablefooter();
     showformfooter();
-    $where = '`send_date` BETWEEN %s AND %s';
-    $params = array(TENCENT_DISCUZX_SMS_SENT_TABLE,$dateStart.' 00:00:00',$dateEnd.' 23:59:59');
+    $where = '`send_date` BETWEEN %d AND %d';
+    $dateStart = strtotime($dateStart.' 00:00:00');
+    $dateEnd = strtotime($dateEnd.' 23:59:59');
+    $params = array(TENCENT_DISCUZX_SMS_SENT_TABLE,$dateStart,$dateEnd);
 
     if (in_array($type,array($dzxSMS::TYPE_LOGIN,$dzxSMS::TYPE_BIND,$dzxSMS::TYPE_RESET_PWD,$dzxSMS::TYPE_REGISTER))) {
-        $where .= 'AND `type`= %d';
+        $where .= ' AND `type`= %d';
         $params[] = $type;
     }
 
     if (!empty($phone)) {
-        $where .= 'AND `phone` LIKE  %s';
-        $params[] = '%'.$phone.'%';
+        $where .= ' AND `phone` LIKE  %s';
+        $params[] = $phone.'%';
     }
 
     showtableheader();
@@ -117,7 +119,7 @@ HTML;
             $record['verify_code'],
             $typeMaps[intval($record['type'])],
             $status,
-            $record['send_date']
+            date('Y-m-d H:i:s',$record['send_date'])
         ));
     }
     $queryString = ADMINSCRIPT."?action={$commonUrl}";

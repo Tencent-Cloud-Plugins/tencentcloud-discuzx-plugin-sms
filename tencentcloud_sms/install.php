@@ -41,7 +41,7 @@ $href = ADMINSCRIPT.'?action=plugins&operation=config&do=' . $pluginid;
 $time = time();
 $inserSQL=<<<EOF
 REPLACE INTO pre_tencentcloud_pluginInfo (`plugin_name`, `version`, `href`, `plugin_id`, `activation`, `status`, `install_datetime`)
- VALUES ( 'tencentcloud_sms', '1.0.0', '$href', '$pluginid', 'true', 'false', '$time');
+ VALUES ( 'tencentcloud_sms', '1.0.1', '$href', '$pluginid', 'true', 'false', '$time');
 EOF;
 runquery($inserSQL);
 
@@ -51,13 +51,14 @@ CREATE TABLE IF NOT EXISTS `cdb_tencent_discuzx_sms_sent_records` (
   `uid` int(10) unsigned NOT NULL DEFAULT 0,
   `verify_code` varchar(16) NOT NULL DEFAULT '' ,
   `phone` varchar(32) NOT NULL DEFAULT '' ,
-  `type` int(10) unsigned NOT NULL  DEFAULT 1 ,
+  `type` tinyint(2) unsigned NOT NULL  DEFAULT 1 ,
   `template_id` varchar(32) NOT NULL DEFAULT '',
   `template_params` text NOT NULL ,
   `response` text NOT NULL ,
-  `status` int(10) unsigned  NOT NULL DEFAULT 0 ,
-  `send_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-  PRIMARY KEY (`id`)
+  `status` tinyint(1) unsigned  NOT NULL DEFAULT 0 ,
+  `send_date` bigint NOT NULL DEFAULT 0 ,
+  PRIMARY KEY (`id`),
+  KEY phone_date_stat_idx(`phone`,`send_date`,`status`)
 ) ENGINE=InnoDB;
 SQL;
 runquery($sql);
@@ -67,9 +68,11 @@ CREATE TABLE IF NOT EXISTS `cdb_tencent_discuzx_sms_user_bind` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `uid` int(10) unsigned NOT NULL DEFAULT 0 ,
   `phone` varchar(32) NOT NULL DEFAULT '' ,
-  `valid` int(10) unsigned NOT NULL  DEFAULT 1 ,
-  `bind_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-  PRIMARY KEY (`id`)
+  `valid` tinyint(1) unsigned NOT NULL  DEFAULT 1 ,
+  `bind_date` bigint NOT NULL DEFAULT 0 ,
+  PRIMARY KEY (`id`),
+  KEY phone_idx(`phone`,`valid`),
+  KEY uid_idx(`uid`,`valid`)
 ) ENGINE=InnoDB;
 SQL;
 runquery($sql);
