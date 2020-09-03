@@ -148,7 +148,7 @@ class SMSOptions
         if ( $codeExpired < 1 ) {
             $codeExpired = 1;
         }
-        $this->codeExpired = intval(ceil($codeExpired));
+        $this->codeExpired = strval(ceil($codeExpired));
     }
 
     public function setCommentNeedPhone($commentNeedPhone)

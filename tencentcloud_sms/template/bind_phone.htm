@@ -44,11 +44,11 @@
         <!--{eval $userPhone = \TencentDiscuzSMS\SMSActions::getPhoneByUid($_G['uid']);}-->
         <div id="bind-block" {if !empty($userPhone) } style="display: none;" {/if} >
             <p class="txc-p">
-            <label for="phone">{lang tencentcloud_sms:bind_phone}：<span class="rq">*</span></label>
+            <label for="phone">{lang tencentcloud_sms:bind_phone}:<span class="rq">*</span></label>
             <input type="text" id="phone" size="28" class="px" autocomplete="off">
             </p>
             <p class="txc-p">
-                <label for="verify-code">{lang tencentcloud_sms:verify_code}：<span class="rq">*</span></label>
+                <label for="verify-code">{lang tencentcloud_sms:verify_code}:<span class="rq">*</span></label>
                 <input type="text" id="verify-code" size="12" class="px" autocomplete="off">
                 <button type="button" class="verify-code-btn" id="get-verify-code"> {lang tencentcloud_sms:send_verify_code}</button>
             </p>
@@ -57,7 +57,7 @@
             </p>
         </div>
 <div id="rebind-block" {if empty($userPhone) } style="display: none;" {/if}>
-    <span>{lang tencentcloud_sms:has_bind}：</span><!--{eval echo substr_replace($userPhone,"****",3,4);}-->
+    <span>{lang tencentcloud_sms:has_bind}:</span><!--{eval echo substr_replace($userPhone,"****",3,4);}-->
     <button type="button" id="rebind-btn"> {lang tencentcloud_sms:rebind}</button>
 </div>
     </form>

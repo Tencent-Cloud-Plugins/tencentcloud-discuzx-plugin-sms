@@ -26,6 +26,8 @@ require_once 'vendor/autoload.php';
 use TencentDiscuzSMS\SMSActions;
 
 try {
+    //后台的展示时间不正确，取消下方代码注释
+//    date_default_timezone_set('Asia/Shanghai');
     global $_G;
     $dzxSMS = new SMSActions();
     $phone = $dzxSMS->filterGetParam('phone');
