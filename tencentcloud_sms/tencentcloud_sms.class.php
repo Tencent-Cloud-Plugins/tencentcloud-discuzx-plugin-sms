@@ -69,6 +69,9 @@ class plugin_tencentcloud_sms
     public function global_usernav_extra3()
     {
         global $_G;
+        if (empty($_G['uid'])) {
+            return;
+        }
         $pluginOptions = unserialize($_G['setting'][TENCENT_DISCUZX_SMS_PLUGIN_NAME]);
         //后台不开启
         if ($pluginOptions['bindPhoneTips'] === SMSOptions::HIDE_BIND_PHONE_TIPS) {
@@ -83,7 +86,7 @@ class plugin_tencentcloud_sms
         if (empty($_G['uid'])){
             return;
         }
-        return '<a href="home.php?ac=plugin&mod=spacecp&id=tencentcloud_sms:bind_phone"><span style="color: red">'.lang('plugin/tencentcloud_sms','unbind').'</span></a>';
+        return '<a href="home.php?mod=spacecp&ac=profile&op=contact"><span style="color: red">'.lang('plugin/tencentcloud_sms','unbind').'</span></a>';
     }
 
 }
@@ -144,6 +147,21 @@ class plugin_tencentcloud_sms_forum extends plugin_tencentcloud_sms
             include template('tencentcloud_sms:need_bind_phone');
             return $need_bind_phone;
         }
+    }
+
+}
+
+class plugin_tencentcloud_sms_home extends plugin_tencentcloud_sms
+{
+
+    public function spacecp_profile_extra()
+    {
+        global $_G;
+        if (empty($_G['uid'])) {
+            return;
+        }
+        include template('tencentcloud_sms:profile_bind');
+        return $profile_bind;
     }
 
 }

@@ -24,9 +24,9 @@ if ( !isset($_SERVER['HTTP_X_REQUESTED_WITH']) || $_SERVER['HTTP_X_REQUESTED_WIT
 
 use TencentDiscuzSMS\SMSActions;
 
+global $_G;
+$dzxSMS = new SMSActions();
 try {
-    $dzxSMS = new SMSActions();
-    global $_G;
     if ( empty($_G['uid']) ) {
         $dzxSMS->jsonReturn($dzxSMS::CODE_NEED_LOGIN);
     }
@@ -50,8 +50,8 @@ try {
 
     //验证码状态变为已使用
     $dzxSMS->loseCodeEfficacy($DBVerifyCode['id']);
-    //绑定手机号
-    $dzxSMS->userBindPhone($phone, $_G['uid']);
+    //绑定手机号 现由common_member_profile表保存
+//    $dzxSMS->userBindPhone($phone, $_G['uid']);
     $dzxSMS->jsonReturn($dzxSMS::CODE_SUCCESS);
 
 } catch (\Exception $exception) {

@@ -1,0 +1,189 @@
+<!--
+ Copyright (C) 2020 Tencent Cloud.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!--{template common/header}-->
+<style type="text/css">
+    .verify-code-btn {
+        color: #ffffff;
+        text-align: center;
+        background-color: #2ea2d9;
+    }
+
+    .verify-code-btn:hover {
+        cursor: pointer;
+    }
+
+    /* 按钮disabled的样式 */
+    button[disabled], .verify-code-btn[disabled]:not([type]) {
+        color: #2ea2d9;
+        border: none;
+        background-color: #ededed;
+    }
+</style>
+
+<!--{if !$_GET['infloat']}-->
+
+<!-- header start -->
+<header class="header">
+    <div class="nav">
+        <a href="javascript:;" onclick="history.go(-1)" class="z"><img src="{STATICURL}image/mobile/images/icon_back.png" /></a>
+        <span>{lang login}</span>
+    </div>
+</header>
+<!-- header end -->
+
+<!--{/if}-->
+
+{eval $loginhash = 'L'.random(4);}
+
+<!-- userinfo start -->
+<div class="loginbox <!--{if $_GET[infloat]}-->login_pop<!--{/if}-->">
+    <!--{if $_GET[infloat]}-->
+    <h2 class="log_tit"><a href="javascript:;" onclick="popup.close();"><span class="icon_close y">&nbsp;</span></a>{lang login}</h2>
+    <!--{/if}-->
+    <form>
+        <input type="hidden" name="formhash" id="formhash" value='{FORMHASH}' />
+        <input type="hidden" name="cookietime" value="2592000">
+        <!--{if $auth}-->
+        <input type="hidden" name="auth" value="$auth" />
+        <!--{/if}-->
+        <div class="login_from">
+            <ul>
+                <li><input type="text" tabindex="1" class="px p_fre" size="30" autocomplete="off" id="phone"  name="phone" placeholder="{lang tencentcloud_sms:phone}" fwin="login"></li>
+                <li><input type="text" tabindex="2" class="px p_fre" size="15" name="verifyCode" id="verify-code" placeholder="{lang tencentcloud_sms:verify_code}" fwin="login">
+                    <button type="button" class="verify-code-btn" id="get-verify-code">{lang tencentcloud_sms:send_verify_code}</button>
+                </li>
+            </ul>
+            <!--{if $seccodecheck}-->
+            <!--{subtemplate common/seccheck}-->
+            <!--{/if}-->
+        </div>
+        <div class="btn_login"><button tabindex="3" id="login-btn" type="button" class="pn pnc"><span>{lang login}</span></button></div>
+    </form>
+    <!--{if $_G['setting']['connect']['allow'] && !$_G['setting']['bbclosed']}-->
+    <p>{lang useqqconnectlogin}</p>
+    <div class="btn_qqlogin"><a href="$_G[connect][login_url]&statfrom=login_simple">{lang qqconnect:connect_mobile_login}</a></div>
+    <!--{/if}-->
+    <!--{if $_G['setting']['regstatus']}-->
+    <p class="reg_link"><a href="member.php?mod={$_G[setting][regname]}">{lang noregister}</a></p>
+    <!--{/if}-->
+    <!--{hook/logging_bottom_mobile}-->
+</div>
+<!-- userinfo end -->
+
+<!--{if $_G['setting']['pwdsafety']}-->
+<script type="text/javascript" src="{$_G['setting']['jspath']}md5.js?{VERHASH}" reload="1"></script>
+<!--{/if}-->
+<!--{eval updatesession();}-->
+<script src="source/plugin/tencentcloud_sms/js/jquery.min.js"></script>
+<script type="text/javascript">
+    jQuery.noConflict();
+    jQuery(function ($) {
+        $("#login-btn").off('click');
+        //倒计时
+        var waitTime = 60;
+        //ajax请求地址
+        var ajaxUrlPrefix = 'plugin.php?id=tencentcloud_sms:';
+
+        function sendCountdown() {
+            if (waitTime > 0) {
+                $('#get-verify-code').text(waitTime + '{lang tencentcloud_sms:flush_code}').attr("disabled", true);
+                waitTime--;
+                setTimeout(sendCountdown, 1000);
+            } else {
+                $('#get-verify-code').text('{lang tencentcloud_sms:get_verify_code}').attr("disabled", false).fadeTo("slow", 1);
+                waitTime = 60;
+            }
+        }
+
+        //获取验证码
+        $("#get-verify-code").click(function () {
+            var phone = $("#phone").val();
+            //校验手机号
+            if (phone === '' || !phone.match(/^1[3-9]\d{9}$/)) {
+                popup.open('{lang tencentcloud_sms:phone_error}', 'alert');
+                $("#phone").focus();
+                return;
+            }
+            //ajax请求
+            $.ajax({
+                type: "post",
+                url: ajaxUrlPrefix + 'get_verify_code',
+                dataType: "json",
+                data: {
+                    phone: phone,
+                    type: 1,
+                },
+                success: function (response) {
+                    if (response.code !== 0) {
+                        popup.open(response.msg, 'alert');
+                        return;
+                    }
+                    sendCountdown();
+                }
+            });
+        });
+
+        //登录
+        $("#login-btn").click(function (e) {
+
+            var phone = $("#phone").val();
+            var verifyCode = $("#verify-code").val();
+            var cookieExpire = $("#cookie-expire").val();
+            var secCode = $("input[name='seccodeverify']").val();
+            var secCodeHash = $("input[name='seccodehash']").val();
+            //校验手机号
+            if (phone === '' || !phone.match(/^1[3-9]\d{9}$/)) {
+                popup.open('{lang tencentcloud_sms:phone_error}', 'alert');
+                $("#phone").focus();
+                return;
+            }
+
+            //校验短信验证码
+            if (verifyCode === '' || verifyCode.length < 4) {
+                popup.open('{lang tencentcloud_sms:phone_error}', 'alert');
+                $("#verify-code").focus();
+                return;
+            }
+            $.ajax({
+                type: "post",
+                url: ajaxUrlPrefix + 'login_by_phone&seccodehash=' + secCodeHash,
+                dataType: "json",
+                data: {
+                    phone: phone,
+                    verifyCode: verifyCode,
+                    secCode: secCode,
+                    cookieExpire: cookieExpire,
+                },
+                success: function (response) {
+                    if (response.code !== 0) {
+                        popup.open(response.msg, 'alert');
+                        return;
+                    }
+                    popup.open('{lang tencentcloud_sms:login_success}', 'alert');
+
+                    setTimeout(function (){
+                        window.location.href='forum.php?mobile=2';
+                    }, 2000);
+                },
+                error: function (e){
+                    console.log(e);
+                }
+            });
+        });
+
+    });
+</script>
+<!--{template common/footer}-->

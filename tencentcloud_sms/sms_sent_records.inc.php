@@ -105,7 +105,7 @@ HTML;
     $sql = "SELECT COUNT(*) FROM %t WHERE {$where}";
     $count = DB::result_first($sql,$params);
 
-    $sql = "SELECT * FROM %t  WHERE {$where} ORDER BY `id` DESC LIMIT {$skip},{$pageSize}";
+    $sql = "SELECT `id`,`uid`,`phone`,`verify_code`,`type`,`status`,`send_date` FROM %t  WHERE {$where} ORDER BY `id` DESC LIMIT {$skip},{$pageSize}";
     $records = DB::fetch_all($sql,$params);
     foreach ($records as $record) {
         if ($record['status'] === '0') {
@@ -117,6 +117,7 @@ HTML;
         }
         showtablerow('', array(), array(
             $record['id'],
+            $record['uid'] ==='0'?'':$record['uid'],
             $record['phone'],
             $record['verify_code'],
             $typeMaps[intval($record['type'])],

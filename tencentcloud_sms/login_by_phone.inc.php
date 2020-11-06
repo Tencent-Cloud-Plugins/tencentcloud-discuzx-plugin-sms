@@ -34,7 +34,7 @@ try {
     $cookieExpire = $dzxSMS->filterGetParam('cookieExpire',0);
     //验证码
     if (!check_seccode($secCode, $secCodeHash)) {
-        $dzxSMS->jsonReturn($dzxSMS::CODE_INVALID_VERIFY_CODE);
+        $dzxSMS->jsonReturn($dzxSMS::CODE_INVALID_SEC_CODE);
     }
     //手机号验证
     if (!$dzxSMS::isPhoneNumber($phone)) {

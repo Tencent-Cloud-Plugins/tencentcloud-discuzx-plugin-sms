@@ -33,16 +33,16 @@ try {
     }
     $bindUid = $dzxSMS::getUidByPhone($phone);
     //手机号未绑定
-    if (empty($bindUid) && $type === $dzxSMS::TYPE_LOGIN) {
+    if (empty($bindUid) && in_array($type,array($dzxSMS::TYPE_LOGIN,$dzxSMS::TYPE_RESET_PWD))) {
         $dzxSMS->jsonReturn($dzxSMS::CODE_PHONE_UNBIND);
     }
     //手机号已被使用
     if ($type === $dzxSMS::TYPE_BIND && !empty($bindUid) && $bindUid != $_G['uid']) {
         $dzxSMS->jsonReturn($dzxSMS::CODE_PHONE_USED);
     }
-
+    $uid = in_array($type,array($dzxSMS::TYPE_LOGIN,$dzxSMS::TYPE_RESET_PWD)) ?$bindUid:$_G['uid'];
     //发送验证码
-    $dzxSMS->sendVerifyCodeSMS($phone,$type,$_G['uid']);
+    $dzxSMS->sendVerifyCodeSMS($phone,$type,$uid);
     $dzxSMS->jsonReturn($dzxSMS::CODE_SUCCESS);
 } catch (\Exception $exception) {
     $dzxSMS->jsonReturn($dzxSMS::CODE_EXCEPTION,array(),$exception->getMessage().'  请联系管理员解决');

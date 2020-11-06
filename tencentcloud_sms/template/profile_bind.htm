@@ -1,0 +1,154 @@
+<!--
+ Copyright (C) 2020 Tencent Cloud.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<!--{block profile_bind}-->
+<style type="text/css">
+    .verify-code-btn {
+        color: #ffffff;
+        text-align: center;
+        margin-left: 1em;
+        background-color: #2ea2d9;
+    }
+
+    .verify-code-btn:hover {
+        cursor: pointer;
+    }
+
+    /* 按钮disabled的样式 */
+    button[disabled], .verify-code-btn[disabled]:not([type]) {
+        color: #2ea2d9;
+        border: none;
+        background-color: #ededed;
+    }
+
+    .disabled-input {
+        background-color: #d4d4d4;
+    }
+
+</style>
+<script src="source/plugin/tencentcloud_sms/js/jquery.min.js"></script>
+<script type="text/javascript">
+    jQuery.noConflict();
+    jQuery(function ($) {
+        var mobileObj = $("#mobile");
+        if (mobileObj.length > 0) {
+            var html = '<td><div id="bind-block">短信验证码：<input id="verify-code" type="text" size="15" >' +
+                '<button id="get-verify-code" type="button" class="verify-code-btn">获取验证码</button></div>' +
+                '<button type="button" id="rebind-btn"> {lang tencentcloud_sms:rebind}</button></td>';
+            $("#td_mobile").append(html);
+            if (!$("#mobile").val().match(/^1[3-9]\d{9}$/)) {
+                $("#bind-block").show();
+                $("#rebind-btn").hide();
+            } else {
+                mobileObj.attr('disabled', true).addClass('disabled-input');
+
+                $("#bind-block").hide();
+                $("#rebind-btn").show();
+            }
+            var random = Math.random().toString(16).substr(-8);
+            //倒计时
+            var waitTime = 60;
+            //ajax请求地址
+            var ajaxUrlPrefix = 'plugin.php?id=tencentcloud_sms:';
+
+            function sendCountdown() {
+                if (waitTime > 0) {
+                    $('#get-verify-code').text(waitTime + '{lang tencentcloud_sms:flush_code}').attr("disabled", true);
+                    waitTime--;
+                    setTimeout(sendCountdown, 1000);
+                } else {
+                    $('#get-verify-code').text('{lang tencentcloud_sms:get_verify_code}').attr("disabled", false).fadeTo("slow", 1);
+                    waitTime = 60;
+                }
+            }
+
+            $('#get-verify-code').on('click', function () {
+                var phone = mobileObj.val();
+                //校验手机号
+                if (phone === '' || !phone.match(/^1[3-9]\d{9}$/)) {
+                    showDialog('{lang tencentcloud_sms:phone_error}', 'error', 'warning', function () {
+                        mobileObj.focus();
+                    });
+                    return;
+                }
+                //请求验证码
+                $.ajax({
+                    type: "post",
+                    url: ajaxUrlPrefix + 'get_verify_code&random_num=' + random,
+                    dataType: "json",
+                    data: {
+                        phone: phone,
+                        type: 2,
+                    },
+                    success: function (response) {
+                        if (response.code !== 0) {
+                            showDialog(response.msg, 'error', 'error Tips');
+                            return;
+                        }
+                        sendCountdown();
+                    }
+                });
+            });
+            $('#rebind-btn').on('click', function () {
+                $("#bind-block").show();
+                $("#rebind-btn").hide();
+                mobileObj.attr('disabled', false).removeClass('disabled-input').val('').focus();
+            });
+
+            $("#profilesubmitbtn").click(function (e) {
+                var phone = mobileObj.val();
+                var verifyCode = $("#verify-code").val();
+                if ($("#bind-block").is(":visible") && phone !=='') {
+                    e.preventDefault();
+                    //校验手机号
+                    if (!phone.match(/^1[3-9]\d{9}$/)) {
+                        showDialog('{lang tencentcloud_sms:phone_error}', 'error', 'warning', function () {
+                            mobileObj.focus();
+                        });
+                        return false;
+                    }
+                    //校验短信验证码
+                    if ( verifyCode.length < 4) {
+                        showDialog('{lang tencentcloud_sms:code_error}', 'error', 'warning', function () {
+                            $("#verify-code").focus();
+                        });
+                        return false;
+                    }
+
+                    $.ajax({
+                        type: "post",
+                        url: ajaxUrlPrefix + 'bind_phone&random_num=' + random,
+                        dataType: "json",
+                        data: {
+                            phone: phone,
+                            verifyCode: verifyCode,
+                        },
+                        success: function (response) {
+                            if (response.code !== 0) {
+                                showDialog(response.msg, 'error', 'error Tips');
+                                return false;
+                            }
+                            $("form[target='frame_profile']").submit();
+                        }
+                    });
+                }
+            });
+        }
+
+
+    });
+</script>
+<!--{/block}-->

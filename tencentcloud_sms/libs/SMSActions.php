@@ -23,6 +23,8 @@ use TencentCloud\Sms\V20190711\Models\SendSmsRequest;
 use TencentCloud\Common\Exception\TencentCloudSDKException;
 use TencentCloud\Common\Credential;
 defined('TENCENT_DISCUZX_SMS_PLUGIN_NAME')||define( 'TENCENT_DISCUZX_SMS_PLUGIN_NAME', 'tencentcloud_sms');
+defined('TENCENT_DISCUZX_USER_BIND_TABLE')||define( 'TENCENT_DISCUZX_USER_BIND_TABLE', 'tencent_discuzx_sms_user_bind');
+defined('TENCENT_DISCUZX_SMS_SENT_TABLE')||define( 'TENCENT_DISCUZX_SMS_SENT_TABLE', 'tencent_discuzx_sms_sent_records');
 class SMSActions
 {
     const PLUGIN_TYPE = 'sms';
@@ -35,6 +37,7 @@ class SMSActions
     const CODE_TWO_PWD_UNEQUAL = 10005;
     const CODE_NEW_PWD_TOO_SHORT = 10006;
     const CODE_PHONE_USED = 10007;
+    const CODE_INVALID_SEC_CODE = 10008;
 
     //短信验证码发送成功
     const VERIFY_CODE_SUCCESS = 0;
@@ -296,12 +299,24 @@ class SMSActions
         if (empty($uid) || !is_numeric($uid)) {
             return '';
         }
+        //先去用户资料表里查询
+        $profile = C::t('common_member_profile')->fetch($uid);
+        if ($profile !== false && !empty($profile['mobile'])) {
+            return $profile['mobile'];
+        }
         $uid = intval($uid);
         $sql = "SELECT `phone` FROM %t WHERE `valid`=%d AND `uid`= %d ORDER BY `id` DESC";
-        $result = DB::fetch_first($sql,array(TENCENT_DISCUZX_USER_BIND_TABLE,self::BIND_VALID,$uid));
-        $phone = '';
-        if (isset($result['phone']) && !empty($result['phone'])) {
-            $phone = $result['phone'];
+        // 兼容之前的逻辑， V1.0.2之后TENCENT_DISCUZX_USER_BIND_TABLE可能不存在
+        try {
+            $result = DB::fetch_first($sql,array(TENCENT_DISCUZX_USER_BIND_TABLE,self::BIND_VALID,$uid));
+            $phone = '';
+            if (isset($result['phone']) && !empty($result['phone'])) {
+                $phone = $result['phone'];
+                //迁移数据
+                self::migrationBindData($phone,$uid);
+            }
+        } catch (\Exception $exception) {
+            return '';
         }
         return $phone;
     }
@@ -315,9 +330,26 @@ class SMSActions
         if (!self::isPhoneNumber($phone)) {
             return 0;
         }
-        $sql = "SELECT `uid` FROM %t WHERE `valid`=%d AND `phone`= %s ORDER BY `id` DESC";
-        $result = DB::fetch_first($sql,array(TENCENT_DISCUZX_USER_BIND_TABLE,self::BIND_VALID,$phone));
-        return isset($result['uid'])?intval($result['uid']):0;
+        $sql = "SELECT `uid` FROM %t WHERE `mobile`= %s";
+        $result = DB::fetch_first($sql,array('common_member_profile',$phone));
+        if (isset($result['uid'])) {
+            return intval($result['uid']);
+        }
+        // 兼容之前的逻辑， V1.0.2之后TENCENT_DISCUZX_USER_BIND_TABLE可能不存在
+        try {
+            $sql = "SELECT `uid` FROM %t WHERE `valid`=%d AND `phone`= %s ORDER BY `id` DESC";
+            $result = DB::fetch_first($sql,array(TENCENT_DISCUZX_USER_BIND_TABLE,self::BIND_VALID,$phone));
+            $uid = 0;
+            if (isset($result['uid']) && !empty($result['uid'])) {
+                $uid = intval($result['uid']);
+                //迁移数据
+                self::migrationBindData($phone,$uid);
+            }
+            return $uid;
+        } catch (\Exception $exception) {
+            return 0;
+        }
+
     }
 
     /**
@@ -363,6 +395,20 @@ class SMSActions
             $data['data']['others'] = json_encode(array('sms_appid'=>$options->getSDKAppID()));
             \TencentCloudHelper::sendUserExperienceInfo($data);
         } catch (\Exception $exception){
+            return;
+        }
+    }
+
+    /**
+     * 迁移绑定数据
+     * @param $mobile
+     * @param $uid
+     */
+    public static function migrationBindData($mobile,$uid)
+    {
+        try {
+            DB::update('common_member_profile',array('mobile'=>$mobile),'uid='.$uid);
+        } catch (\Exception $exception) {
             return;
         }
     }

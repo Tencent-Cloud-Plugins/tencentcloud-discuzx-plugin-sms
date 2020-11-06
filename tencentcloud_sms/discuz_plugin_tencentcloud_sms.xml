@@ -18,7 +18,7 @@
 			<item id="datatables"><![CDATA[]]></item>
 			<item id="directory"><![CDATA[tencentcloud_sms/]]></item>
 			<item id="copyright"><![CDATA[腾讯云]]></item>
-			<item id="version"><![CDATA[1.0.1]]></item>
+			<item id="version"><![CDATA[1.1.0]]></item>
 			<item id="__modules">
 				<item id="0">
 					<item id="name"><![CDATA[tencentcloud_sms]]></item>
@@ -85,6 +85,19 @@
 					<item id="navsubname"><![CDATA[]]></item>
 					<item id="navsuburl"><![CDATA[]]></item>
 				</item>
+				<item id="5">
+					<item id="name"><![CDATA[mobile_tencentcloud_sms]]></item>
+					<item id="param"><![CDATA[]]></item>
+					<item id="menu"><![CDATA[]]></item>
+					<item id="url"><![CDATA[]]></item>
+					<item id="type"><![CDATA[28]]></item>
+					<item id="adminid"><![CDATA[0]]></item>
+					<item id="displayorder"><![CDATA[0]]></item>
+					<item id="navtitle"><![CDATA[]]></item>
+					<item id="navicon"><![CDATA[]]></item>
+					<item id="navsubname"><![CDATA[]]></item>
+					<item id="navsuburl"><![CDATA[]]></item>
+				</item>
 			</item>
 		</item>
 		<item id="version"><![CDATA[X3.4]]></item>
@@ -117,11 +130,12 @@
 				<item id="search"><![CDATA[搜索]]></item>
 				<item id="table_head">
 					<item id="0"><![CDATA[ID]]></item>
-					<item id="1"><![CDATA[手机号]]></item>
-					<item id="2"><![CDATA[验证码]]></item>
-					<item id="3"><![CDATA[验证码用途]]></item>
-					<item id="4"><![CDATA[验证码状态]]></item>
-					<item id="5"><![CDATA[发送时间]]></item>
+					<item id="1"><![CDATA[用户UID]]></item>
+					<item id="2"><![CDATA[手机号]]></item>
+					<item id="3"><![CDATA[验证码]]></item>
+					<item id="4"><![CDATA[验证码用途]]></item>
+					<item id="5"><![CDATA[验证码状态]]></item>
+					<item id="6"><![CDATA[发送时间]]></item>
 				</item>
 				<item id="valid"><![CDATA[有效]]></item>
 				<item id="invalid"><![CDATA[无效]]></item>
@@ -136,12 +150,13 @@
 					<item id="0"><![CDATA[操作成功]]></item>
 					<item id="10000"><![CDATA[系统繁忙，请稍后再试]]></item>
 					<item id="10001"><![CDATA[手机号不正确]]></item>
-					<item id="10002"><![CDATA[验证码不正确]]></item>
+					<item id="10002"><![CDATA[短信验证码不正确]]></item>
 					<item id="10003"><![CDATA[请先登录后再操作]]></item>
 					<item id="10004"><![CDATA[该手机号未绑定任何用户]]></item>
 					<item id="10005"><![CDATA[两次输入的密码不相等]]></item>
 					<item id="10006"><![CDATA[密码长的不符合标准]]></item>
 					<item id="10007"><![CDATA[该手机号已绑定其他用户]]></item>
+					<item id="10008"><![CDATA[图片验证码不正确]]></item>
 					<item id="FailedOperation.TemplateIncorrectOrUnapproved"><![CDATA[该模版ID未审批或请求的参数个数与该模版ID不匹配]]></item>
 					<item id="InvalidParameterValue.IncorrectPhoneNumber"><![CDATA[手机号格式错误]]></item>
 					<item id="InvalidParameter"><![CDATA[模板ID与模板参数个数不匹配]]></item>
@@ -155,6 +170,7 @@
 					<item id="FailedOperation.PhoneNumberOnBlacklist"><![CDATA[手机号在黑名单库中，通常是用户退订或者命中运营商黑名单导致的。]]></item>
 					<item id="LimitExceeded.PhoneNumberOneHourLimit"><![CDATA[单个手机号1小时内下发短信条数超过设定的上限，可自行到腾讯云控制台调整短信频率限制策略。]]></item>
 					<item id="LimitExceeded.PhoneNumberThirtySecondLimit"><![CDATA[单个手机号30秒内下发短信条数超过设定的上限，可自行到腾讯云控制台调整短信频率限制策略。]]></item>
+					<item id="LimitExceeded.PhoneNumberDailyLimit"><![CDATA[单个手机号日下发短信条数超过设定的上限，可自行到控制台调整短信频率限制策略。]]></item>
 				</item>
 			</item>
 			<item id="templatelang">
@@ -194,6 +210,7 @@
 				<item id="phone_error"><![CDATA[手机号格式错误！]]></item>
 				<item id="code_error"><![CDATA[短信验证码填写错误！]]></item>
 				<item id="bind_first"><![CDATA[需要先绑定手机号]]></item>
+				<item id="goto_bind_page"><![CDATA[请前往个人资料页进行绑定]]></item>
 				<item id="phone_login"><![CDATA[手机号登录]]></item>
 				<item id="phone_reset"><![CDATA[手机号重置密码]]></item>
 				<item id="phone"><![CDATA[手机号]]></item>
@@ -214,5 +231,6 @@
 		<item id="uninstallfile"><![CDATA[uninstall.php]]></item>
 		<item id="enablefile"><![CDATA[enable.php]]></item>
 		<item id="disablefile"><![CDATA[disable.php]]></item>
+		<item id="upgradefile"><![CDATA[upgrade.php]]></item>
 	</item>
 </root>

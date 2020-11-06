@@ -62,19 +62,10 @@ CREATE TABLE IF NOT EXISTS `cdb_tencent_discuzx_sms_sent_records` (
 ) ENGINE=InnoDB;
 SQL;
 runquery($sql);
-
-$sql = <<<SQL
-CREATE TABLE IF NOT EXISTS `cdb_tencent_discuzx_sms_user_bind` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `uid` int(10) unsigned NOT NULL DEFAULT 0 ,
-  `phone` varchar(32) NOT NULL DEFAULT '' ,
-  `valid` tinyint(1) unsigned NOT NULL  DEFAULT 1 ,
-  `bind_date` bigint NOT NULL DEFAULT 0 ,
-  PRIMARY KEY (`id`),
-  KEY phone_idx(`phone`,`valid`),
-  KEY uid_idx(`uid`,`valid`)
-) ENGINE=InnoDB;
-SQL;
-runquery($sql);
-SMSActions::uploadDzxStatisticsData('activate');
+try {
+    SMSActions::uploadDzxStatisticsData('activate');
+    runquery("ALTER TABLE `cdb_common_member_profile` ADD INDEX mobile_uid_IDX (`mobile`, `uid`)");
+} catch (\Exception $exception) {
+    $finish = true;
+}
 $finish = true;
